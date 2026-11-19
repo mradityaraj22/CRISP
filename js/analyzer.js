@@ -276,6 +276,7 @@ export function frictionLevel(key, value) {
 
 const LEVEL_TEXT = { low: 'Low friction', moderate: 'Moderate friction', high: 'High friction' };
 const LEVEL_ICON = { low: '●', moderate: '◆', high: '▲' };
+const LEVEL_SHORT = { low: 'Low', moderate: 'Moderate', high: 'High' };
 const NS = 'http://www.w3.org/2000/svg';
 
 export function debounce(fn, ms) {
@@ -308,7 +309,7 @@ function buildChart(svg, compact) {
   svg.replaceChildren();
   const W = compact ? 340 : 640;
   const LEFT = compact ? 0 : 190;
-  const RIGHT = compact ? 56 : 64;
+  const RIGHT = compact ? 104 : 128; // room for "24.0 · High" labels
   const ROW = compact ? 72 : 52;
   const BAR = 22;
   const TOP = compact ? 24 : 8;
@@ -320,7 +321,12 @@ function buildChart(svg, compact) {
   const pat = svgEl('pattern', { id: 'll-hatch', width: 6, height: 6, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' });
   pat.append(svgEl('rect', { width: 6, height: 6, class: 'bar-high-fill' }),
              svgEl('line', { x1: 0, y1: 0, x2: 0, y2: 6, class: 'bar-hatch-line' }));
-  defs.append(pat);
+  // Moderate bars get dots, so Low / Moderate / High differ by pattern as well as colour.
+  // (Phase 4 self-test: Low and Moderate were identical under achromatopsia in dark mode.)
+  const dots = svgEl('pattern', { id: 'll-dots', width: 7, height: 7, patternUnits: 'userSpaceOnUse' });
+  dots.append(svgEl('rect', { width: 7, height: 7, class: 'bar-moderate-fill' }),
+              svgEl('circle', { cx: 3.5, cy: 3.5, r: 1.4, class: 'bar-dot' }));
+  defs.append(pat, dots);
   svg.append(defs);
 
   const rows = {};
@@ -353,7 +359,8 @@ function buildChart(svg, compact) {
       bar.setAttribute('width', w.toFixed(1));
       bar.setAttribute('class', `chart-bar bar-${level}`);
       value.setAttribute('x', (LEFT + Math.min(w, plotW) + 8).toFixed(1));
-      value.textContent = fmt(key, v) + (v > s.max ? '+' : '');
+      // The level word is a text cue that survives any colour-vision deficiency.
+      value.textContent = `${fmt(key, v)}${v > s.max ? '+' : ''} · ${LEVEL_SHORT[level]}`;
     }
   };
 }

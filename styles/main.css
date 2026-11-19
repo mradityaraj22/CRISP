@@ -208,7 +208,11 @@ textarea {
 .chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
 .swatch { display: inline-block; width: 14px; height: 14px; border-radius: 3px; }
 .swatch-low { background: var(--color-clarity); }
-.swatch-moderate { background: var(--color-accent); }
+.swatch-moderate {
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--color-surface) 60%, transparent) 1.4px, transparent 1.6px) 0 0 / 5px 5px,
+    var(--color-accent);
+}
 .swatch-high {
   background: repeating-linear-gradient(45deg, var(--color-friction) 0 4px, var(--color-friction-tint) 4px 6px);
 }
@@ -218,9 +222,15 @@ textarea {
 .chart-track { fill: var(--color-surface-alt); }
 .chart-threshold { stroke: var(--color-border); stroke-width: 1.5; stroke-dasharray: 3 3; }
 .chart-tick { font-size: 11px; fill: var(--color-text-muted); font-variant-numeric: tabular-nums; }
-.chart-value { font-size: 14px; font-weight: 700; fill: var(--color-text); font-variant-numeric: tabular-nums; }
+.chart-value {
+  font-size: 14px; font-weight: 700; fill: var(--color-text); font-variant-numeric: tabular-nums;
+  /* Halo so threshold lines never cut through the label. */
+  paint-order: stroke; stroke: var(--color-surface); stroke-width: 5px; stroke-linejoin: round;
+}
 .bar-low { fill: var(--color-clarity); }
-.bar-moderate { fill: var(--color-accent); }
+.bar-moderate { fill: url(#ll-dots); }
+.bar-moderate-fill { fill: var(--color-accent); }
+.bar-dot { fill: var(--color-surface); fill-opacity: 0.6; }
 .bar-high { fill: url(#ll-hatch); }
 .bar-high-fill { fill: var(--color-friction); }
 .bar-hatch-line { stroke: var(--color-surface); stroke-width: 1.6; stroke-opacity: 0.6; }
