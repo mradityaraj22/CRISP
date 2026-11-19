@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LectureLens Phase 2 Architecture</title>
+<style>
+  :root {
+    --navy: #041E42;
+    --muted: #3E4C63;
+    --green: #065F46;
+    --green-tint: #ECF6F1;
+    --red: #B91C1C;
+    --red-tint: #FDF0F0;
+    --line: #6B7689;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #FFFFFF;
+    color: var(--navy);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .card { max-width: 980px; margin: 0 auto; padding: 32px 16px 24px; }
+  h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 20px; font-size: 0.975rem; }
+  svg { width: 100%; height: auto; display: block; }
+  .t-title { font-size: 16px; font-weight: 700; fill: var(--navy); }
+  .t-body { font-size: 13px; fill: var(--muted); }
+  .t-mono { font-size: 12.5px; fill: var(--muted); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .t-zone-ok { font-size: 13px; font-weight: 700; fill: var(--green); letter-spacing: 0.02em; }
+  .t-zone-bad { font-size: 14px; font-weight: 700; fill: var(--red); letter-spacing: 0.02em; }
+  .t-x { font-size: 15px; font-weight: 700; fill: var(--red); }
+  .t-xbody { font-size: 12.5px; fill: var(--muted); }
+  .t-edge { font-size: 12.5px; font-weight: 600; fill: var(--red); }
+  .foot { color: var(--muted); font-size: 0.85rem; margin-top: 14px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>LectureLens architecture and scope boundary</h1>
+  <p class="sub">Everything runs inside the browser. The red box is complexity we chose not to build.</p>
+
+  <svg viewBox="0 0 960 640" role="img" aria-labelledby="diagram-title diagram-desc">
+    <title id="diagram-title">LectureLens zero-dependency client-side pipeline</title>
+    <desc id="diagram-desc">Text input flows into three in-browser modules: Readability Analyzer, Visual Simulator and Plain-English Restructurer. All three feed Accessible Output. Below, a dashed red box lists excluded complexity: Cloud LLM APIs, PDF-OCR server, and user auth with a database. No network calls cross the boundary.</desc>
+
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#041E42"/>
+      </marker>
+    </defs>
+
+    <!-- Browser boundary -->
+    <rect x="232" y="40" width="472" height="372" rx="14" fill="#ECF6F1" stroke="#065F46" stroke-width="2"/>
+    <text x="256" y="70" class="t-zone-ok">BROWSER ONLY · ZERO DEPENDENCIES · WORKS OFFLINE</text>
+
+    <!-- Input -->
+    <rect x="20" y="166" width="176" height="128" rx="10" fill="#FFFFFF" stroke="#041E42" stroke-width="2"/>
+    <text x="40" y="198" class="t-title">Text Input</text>
+    <text x="40" y="224" class="t-body">Paste notes, or load</text>
+    <text x="40" y="244" class="t-body">Sample A / Sample B</text>
+    <text x="40" y="272" class="t-mono">index.html</text>
+
+    <!-- Modules -->
+    <g>
+      <rect x="272" y="92" width="392" height="84" rx="10" fill="#FFFFFF" stroke="#041E42" stroke-width="1.5"/>
+      <text x="292" y="122" class="t-title">Readability Analyzer</text>
+      <text x="292" y="144" class="t-body">Grade level, jargon, cognitive load score</text>
+      <text x="292" y="164" class="t-mono">js/analyzer.js</text>
+    </g>
+    <g>
+      <rect x="272" y="196" width="392" height="84" rx="10" fill="#FFFFFF" stroke="#041E42" stroke-width="1.5"/>
+      <text x="292" y="226" class="t-title">Visual Simulator</text>
+      <text x="292" y="248" class="t-body">SVG feColorMatrix, glare, Dyslexia, ADHD</text>
+      <text x="292" y="268" class="t-mono">js/simulator.js</text>
+    </g>
+    <g>
+      <rect x="272" y="300" width="392" height="84" rx="10" fill="#FFFFFF" stroke="#041E42" stroke-width="1.5"/>
+      <text x="292" y="330" class="t-title">Plain-English Restructurer</text>
+      <text x="292" y="352" class="t-body">Chunked cards, bold anchors, Focus mode</text>
+      <text x="292" y="372" class="t-mono">js/restructurer.js</text>
+    </g>
+
+    <!-- Output -->
+    <rect x="744" y="148" width="196" height="164" rx="10" fill="#FFFFFF" stroke="#065F46" stroke-width="2"/>
+    <text x="764" y="180" class="t-title">Accessible Output</text>
+    <text x="764" y="206" class="t-body">Metrics + chart</text>
+    <text x="764" y="226" class="t-body">Simulated view</text>
+    <text x="764" y="246" class="t-body">Scannable cards</text>
+    <text x="764" y="276" class="t-mono">ARIA · keyboard</text>
+    <text x="764" y="296" class="t-mono">AAA body text</text>
+
+    <!-- Arrows: input -> modules -->
+    <g fill="none" stroke="#041E42" stroke-width="2">
+      <path d="M196,230 H234 V134 H268" marker-end="url(#arrow)"/>
+      <path d="M234,230 V238 H268" marker-end="url(#arrow)"/>
+      <path d="M234,238 V342 H268" marker-end="url(#arrow)"/>
+    </g>
+    <!-- Arrows: modules -> output -->
+    <g fill="none" stroke="#041E42" stroke-width="2">
+      <path d="M664,134 H704 V226"/>
+      <path d="M664,342 H704 V234"/>
+      <path d="M664,238 H704"/>
+      <path d="M704,230 H740" marker-end="url(#arrow)"/>
+    </g>
+
+    <!-- Scope boundary: blocked edge -->
+    <line x1="468" y1="412" x2="468" y2="470" stroke="#B91C1C" stroke-width="2" stroke-dasharray="6 5"/>
+    <g transform="translate(468 441)">
+      <circle r="13" fill="#FFFFFF" stroke="#B91C1C" stroke-width="2"/>
+      <path d="M-5,-5 L5,5 M5,-5 L-5,5" stroke="#B91C1C" stroke-width="2.5" stroke-linecap="round"/>
+    </g>
+    <text x="492" y="446" class="t-edge">No network calls leave the browser</text>
+
+    <!-- Excluded complexity -->
+    <rect x="132" y="470" width="672" height="150" rx="14" fill="#FDF0F0" stroke="#B91C1C" stroke-width="2" stroke-dasharray="9 6"/>
+    <text x="156" y="502" class="t-zone-bad">EXCLUDED COMPLEXITY (OUT OF SCOPE)</text>
+
+    <g transform="translate(156 520)">
+      <text x="0" y="22" class="t-x">✕  Cloud LLM APIs</text>
+      <text x="0" y="48" class="t-xbody">Sends user text to a third</text>
+      <text x="0" y="66" class="t-xbody">party. Costs money, adds</text>
+      <text x="0" y="84" class="t-xbody">latency, hard to verify.</text>
+    </g>
+    <g transform="translate(380 520)">
+      <text x="0" y="22" class="t-x">✕  PDF-OCR Server</text>
+      <text x="0" y="48" class="t-xbody">Needs Python hosting and</text>
+      <text x="0" y="66" class="t-xbody">deploys. OCR errors skew</text>
+      <text x="0" y="84" class="t-xbody">every metric.</text>
+    </g>
+    <g transform="translate(604 520)">
+      <text x="0" y="22" class="t-x">✕  User Auth / DB</text>
+      <text x="0" y="48" class="t-xbody">Stores personal data.</text>
+      <text x="0" y="66" class="t-xbody">Adds security duties the</text>
+      <text x="0" y="84" class="t-xbody">core goal never needs.</text>
+    </g>
+  </svg>
+
+  <p class="foot">Source: <code>PROPOSAL.md</code>, sections 5 and 7. Green solid border = built. Red dashed border = deliberately excluded.</p>
+</main>
+</body>
+</html>
