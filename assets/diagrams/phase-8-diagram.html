@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LectureLens Phase 8 Hardening</title>
+<style>
+  :root { --navy: #041E42; --muted: #3E4C63; --green: #065F46; --red: #B91C1C; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #FFFFFF; color: var(--navy); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .card { max-width: 1020px; margin: 0 auto; padding: 32px 16px 24px; }
+  h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 20px; font-size: 0.975rem; }
+  svg { width: 100%; height: auto; display: block; }
+  .colh { font-size: 17px; font-weight: 800; }
+  .colsub { font-size: 13px; fill: var(--muted); }
+  .rowh { font-size: 14.5px; font-weight: 800; fill: var(--navy); }
+  .t { font-size: 13.5px; fill: var(--navy); }
+  .tm { font-size: 13px; fill: var(--muted); }
+  .x { font-size: 15px; font-weight: 800; fill: var(--red); }
+  .ok { font-size: 15px; font-weight: 800; fill: var(--green); }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px; }
+  .bad { fill: var(--red); font-weight: 700; }
+  .good { fill: var(--green); font-weight: 700; }
+  .sec { font-size: 12.5px; font-weight: 700; letter-spacing: 0.06em; fill: var(--green); }
+  .node { font-size: 14px; font-weight: 700; fill: var(--navy); text-anchor: middle; }
+  .nodes { font-size: 12px; fill: var(--muted); text-anchor: middle; }
+  .edge { font-size: 12px; font-weight: 600; fill: var(--navy); }
+  .foot { color: var(--muted); font-size: 0.85rem; margin-top: 14px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>Academic demo mindset vs production mindset</h1>
+  <p class="sub">The same tool, two sets of assumptions. Right-hand numbers are measured LectureLens results from Phase 8.</p>
+
+  <svg viewBox="0 0 1000 900" role="img" aria-labelledby="t d">
+    <title id="t">Academic demo mindset versus production industry mindset</title>
+    <desc id="d">Six rows compare the two mindsets. Input: a demo assumes clean prose, so exported #include angle-bracket vector disappears in Markdown; production escapes it as an HTML entity and blocks innerHTML with variables. Network: a demo needs live Wi-Fi; production uses a cache-first service worker and loaded with the server switched off. Size: a demo is tested on 128 words; production cuts a 100,096-word paste to 19,968 words at a sentence end, with no main-thread task over 50 milliseconds, down from 162. Unicode: a demo splits naive into na and ve; production counts letters in any script. Errors: a demo shows a blank page; production shows an offline badge, a long-text notice and a clear offline message. Lifetime: a demo is thrown away after grading; production has a hash-stamped cache version, 66 tests and 106 audit checks. At the bottom, the cache-first loop: page request, service worker, cache answers instantly, network refreshes the cache in the background.</desc>
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#041E42"/>
+      </marker>
+    </defs>
+
+    <!-- Headers -->
+    <rect x="170" y="10" width="400" height="66" rx="12" fill="#FDF0F0" stroke="#B91C1C" stroke-width="1.5" stroke-dasharray="7 5"/>
+    <text x="190" y="40" class="colh" style="fill:#B91C1C">✕ Academic Demo Mindset</text>
+    <text x="190" y="62" class="colsub">Clean input, live Wi-Fi, graded once, thrown away</text>
+    <rect x="586" y="10" width="404" height="66" rx="12" fill="#ECF6F1" stroke="#065F46" stroke-width="2"/>
+    <text x="606" y="40" class="colh" style="fill:#065F46">✓ Production Industry Mindset</text>
+    <text x="606" y="62" class="colsub">Messy input, bad networks, used and maintained for years</text>
+
+    <g fill="#F7F8FA">
+      <rect x="10" y="88" width="980" height="96" rx="10"/>
+      <rect x="10" y="288" width="980" height="86" rx="10"/>
+      <rect x="10" y="470" width="980" height="86" rx="10"/>
+    </g>
+
+    <!-- Row: input -->
+    <text x="26" y="118" class="rowh">Pasted code</text>
+    <text x="26" y="138" class="tm">and HTML</text>
+    <text x="190" y="118" class="x">✕</text><text x="212" y="118" class="t">Export writes raw text to Markdown:</text>
+    <text x="212" y="142" class="t mono">#include <tspan class="bad">&lt;vector&gt;</tspan></text>
+    <text x="212" y="166" class="t">Markdown reads it as an HTML tag: <tspan class="bad">gone</tspan></text>
+    <text x="606" y="118" class="ok">✓</text><text x="628" y="118" class="t">Export escapes <tspan class="mono">&lt; &gt; &amp;</tspan>:</text>
+    <text x="628" y="142" class="t mono">#include <tspan class="good">&amp;lt;vector&amp;gt;</tspan></text>
+    <text x="628" y="166" class="t">Renders as <tspan class="mono good">&lt;vector&gt;</tspan>. Audit bans innerHTML + ${…}</text>
+
+    <!-- Row: network -->
+    <text x="26" y="222" class="rowh">Network</text>
+    <text x="190" y="222" class="x">✕</text><text x="212" y="222" class="t">Needs live Wi-Fi on every visit</text>
+    <text x="212" y="246" class="t">Dead in a thick-walled lecture hall</text>
+    <text x="606" y="222" class="ok">✓</text><text x="628" y="222" class="t">Cache-first <tspan class="mono">sw.js</tspan>, 13 files cached</text>
+    <text x="628" y="246" class="t">Loaded and ran with the server <tspan class="good">switched off</tspan></text>
+    <text x="628" y="270" class="tm">Installable via <tspan class="mono">manifest.json</tspan></text>
+
+    <!-- Row: size -->
+    <text x="26" y="318" class="rowh">Input size</text>
+    <text x="190" y="318" class="x">✕</text><text x="212" y="318" class="t">Tested on a 128-word sample</text>
+    <text x="212" y="342" class="t">100,000 words: 782 cards, <tspan class="bad">162 ms</tspan> freeze</text>
+    <text x="606" y="318" class="ok">✓</text><text x="628" y="318" class="t">Cut to 19,968 of 100,096 words at a sentence end</text>
+    <text x="628" y="342" class="t">No main-thread task <tspan class="good">over 50 ms</tspan>; a notice explains</text>
+    <text x="628" y="364" class="tm">Slower live updates above ~25,000 words</text>
+
+    <!-- Row: unicode -->
+    <text x="26" y="406" class="rowh">Unicode</text>
+    <text x="190" y="406" class="x">✕</text><text x="212" y="406" class="t">ASCII-only words: “Naïve” → <tspan class="bad mono">Na</tspan> + <tspan class="bad mono">ve</tspan></text>
+    <text x="212" y="430" class="t">“café” → <tspan class="bad mono">caf</tspan></text>
+    <text x="606" y="406" class="ok">✓</text><text x="628" y="406" class="t">Letters in any script: <tspan class="good">Naïve, café, नमस्ते</tspan></text>
+    <text x="628" y="430" class="t">Emoji ignored, never bolded or counted</text>
+
+    <!-- Row: errors -->
+    <text x="26" y="500" class="rowh">Failure</text>
+    <text x="26" y="520" class="tm">states</text>
+    <text x="190" y="500" class="x">✕</text><text x="212" y="500" class="t">Blank page or a browser error</text>
+    <text x="212" y="524" class="t">User has no idea what happened</text>
+    <text x="606" y="500" class="ok">✓</text><text x="628" y="500" class="t">○ Offline badge · ⚠ long-text notice</text>
+    <text x="628" y="524" class="t">Plain 503 message if a file was never cached</text>
+
+    <!-- Row: lifetime -->
+    <text x="26" y="590" class="rowh">Lifetime</text>
+    <text x="190" y="590" class="x">✕</text><text x="212" y="590" class="t">Graded once, then deleted</text>
+    <text x="212" y="614" class="t">Nobody has to maintain it</text>
+    <text x="606" y="590" class="ok">✓</text><text x="628" y="590" class="t">Cache version = hash of the files (<tspan class="mono">npm run stamp</tspan>)</text>
+    <text x="628" y="614" class="t"><tspan class="good">66 tests</tspan> · <tspan class="good">106 audit checks</tspan> · README</text>
+
+    <!-- Cache-first loop -->
+    <rect x="10" y="650" width="980" height="236" rx="14" fill="#FFFFFF" stroke="#065F46" stroke-width="2"/>
+    <text x="34" y="682" class="sec">THE CACHE-FIRST LOOP IN sw.js</text>
+
+    <rect x="40" y="712" width="180" height="70" rx="10" fill="#F7F8FA" stroke="#041E42" stroke-width="1.5"/>
+    <text x="130" y="742" class="node">Page asks for a file</text>
+    <text x="130" y="764" class="nodes">index.html, app.js…</text>
+
+    <rect x="300" y="712" width="180" height="70" rx="10" fill="#F7F8FA" stroke="#041E42" stroke-width="1.5"/>
+    <text x="390" y="742" class="node">Service worker</text>
+    <text x="390" y="764" class="nodes">same-origin GET only</text>
+
+    <rect x="560" y="712" width="180" height="70" rx="10" fill="#ECF6F1" stroke="#065F46" stroke-width="2"/>
+    <text x="650" y="742" class="node">Cache</text>
+    <text x="650" y="764" class="nodes">answers instantly</text>
+
+    <rect x="800" y="712" width="170" height="70" rx="10" fill="#F7F8FA" stroke="#041E42" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="885" y="742" class="node">Network</text>
+    <text x="885" y="764" class="nodes">if reachable</text>
+
+    <g stroke="#041E42" stroke-width="2.2" fill="none">
+      <path d="M220,747 H296" marker-end="url(#arrow)"/>
+      <path d="M480,747 H556" marker-end="url(#arrow)"/>
+      <path d="M650,782 V826 H130 V786" marker-end="url(#arrow)"/>
+      <path d="M740,735 H796" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+      <path d="M800,762 H744" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+    </g>
+    <text x="236" y="738" class="edge">request</text>
+    <text x="494" y="738" class="edge">look up</text>
+    <text x="290" y="846" class="edge">1. cached copy returned at once, online or offline</text>
+    <text x="745" y="704" class="edge">2. refresh</text>
+    <text x="748" y="796" class="edge">update</text>
+    <text x="34" y="872" class="tm">Trade-off seen in testing: the first load after an update still runs the old version; the next load gets the new one.</text>
+  </svg>
+
+  <p class="foot">Source: <code>sw.js</code>, <code>manifest.json</code>, <code>index.html</code>, <code>js/restructurer.js</code>, <code>js/analyzer.js</code>, <code>scripts/test-pwa.js</code>, <code>scripts/audit.js</code>.</p>
+</main>
+</body>
+</html>
