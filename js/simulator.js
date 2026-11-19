@@ -282,6 +282,13 @@ export function mountSimulator({ input, output, live }) {
 
   return {
     update() { clearTimeout(timer); renderSlides(); },
+    /** What a screen reader should hear after the preview updates. */
+    summary() {
+      const paragraphs = baseSlide.querySelectorAll('.slide-text').length;
+      const extras = [state.crowding && 'crowded spacing', state.glare && 'screen glare'].filter(Boolean);
+      return `Preview updated: ${paragraphs} ${paragraphs === 1 ? 'paragraph' : 'paragraphs'}, ` +
+        `${CVD_MODES[state.cvd].label.toLowerCase()}${extras.length ? ' with ' + extras.join(' and ') : ''}.`;
+    },
     state,
   };
 }

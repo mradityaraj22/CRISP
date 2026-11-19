@@ -24,6 +24,7 @@ const analyzer = mountAnalyzer({
   input: textarea,
   output: document.getElementById('analyzer-output'),
   live,
+  announce: false, // the page-level announcer below speaks for the visible tab
 });
 
 // ---- Visual Simulator ----
@@ -40,13 +41,35 @@ const restructurer = mountRestructurer({
   live,
 });
 
+// ---- One announcer for the whole page ----
+// Every module updates on input, but only the VISIBLE module is announced. Before Phase 6
+// the hidden analyzer announced its grade while the visible restructurer stayed silent.
+const modules = { 'tab-analyzer': analyzer, 'tab-simulator': simulator, 'tab-restructurer': restructurer };
+const activeModule = () => modules[document.querySelector('[role="tab"][aria-selected="true"]').id];
+let lastAnnouncement = '';
+let announceTimer;
+
+function announce(message) {
+  // Re-announcing identical text is ignored by some screen readers, so skip duplicates.
+  if (!message || message === lastAnnouncement) return;
+  live.textContent = message;
+  lastAnnouncement = message;
+}
+
+textarea.addEventListener('input', () => {
+  clearTimeout(announceTimer);
+  // Wait until typing pauses (1 s), after the modules' 150 ms render has finished.
+  announceTimer = setTimeout(() => announce(activeModule().summary()), 1000);
+});
+
 function loadSample(sample) {
   textarea.value = sample.text;
   updateWordCount();
   analyzer.update();
   simulator.update();
   restructurer.update();
-  live.textContent = `Loaded ${sample.label}.`;
+  clearTimeout(announceTimer);
+  announce(`Loaded ${sample.label}. ${activeModule().summary()}`);
 }
 
 document.getElementById('load-sample-a').addEventListener('click', () => loadSample(SAMPLES.dense));

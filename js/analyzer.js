@@ -380,12 +380,22 @@ const CARD_DEFS = [
   { key: 'cognitiveLoad', label: 'Cognitive load', format: (r) => `${r.cognitiveLoad} / 100` },
 ];
 
+/** The sentence a screen reader hears about a result. */
+export function analyzerSummary(r) {
+  if (!r.wordCount) return 'No text to analyse.';
+  return `Grade ${r.fleschKincaidGrade.toFixed(1)}, ${LEVEL_TEXT[frictionLevel('fleschKincaidGrade', r.fleschKincaidGrade)].toLowerCase()}. ` +
+    `Cognitive load ${r.cognitiveLoad} out of 100, ${LEVEL_TEXT[frictionLevel('cognitiveLoad', r.cognitiveLoad)].toLowerCase()}.`;
+}
+
 /**
  * Mount the live analyzer.
+ * Announcements: by default the analyzer announces its own updates. When several modules
+ * share one live region, pass announce: false and let the page announce summary() for
+ * whichever module is visible (Phase 6: the hidden analyzer used to talk over the others).
  * @param {{ input: HTMLTextAreaElement, output: HTMLElement, live: HTMLElement,
- *           computeDelay?: number, announceDelay?: number }} opts
+ *           computeDelay?: number, announceDelay?: number, announce?: boolean }} opts
  */
-export function mountAnalyzer({ input, output, live, computeDelay = 150, announceDelay = 1000 }) {
+export function mountAnalyzer({ input, output, live, computeDelay = 150, announceDelay = 1000, announce: shouldAnnounce = true }) {
   output.classList.remove('placeholder');
   output.innerHTML = `
     <div class="metric-grid" role="list"></div>
@@ -445,8 +455,7 @@ export function mountAnalyzer({ input, output, live, computeDelay = 150, announc
   let lastAnnouncement = '';
   const announce = debounce((r) => {
     if (!r.wordCount) return;
-    const msg = `Grade ${r.fleschKincaidGrade.toFixed(1)}, ${LEVEL_TEXT[frictionLevel('fleschKincaidGrade', r.fleschKincaidGrade)].toLowerCase()}. ` +
-      `Cognitive load ${r.cognitiveLoad} out of 100, ${LEVEL_TEXT[frictionLevel('cognitiveLoad', r.cognitiveLoad)].toLowerCase()}.`;
+    const msg = analyzerSummary(r);
     if (msg !== lastAnnouncement) {
       live.textContent = msg;
       lastAnnouncement = msg;
@@ -488,7 +497,7 @@ export function mountAnalyzer({ input, output, live, computeDelay = 150, announc
       return tr;
     }));
 
-    announce(r);
+    if (shouldAnnounce) announce(r);
     return r;
   }
 
@@ -499,6 +508,8 @@ export function mountAnalyzer({ input, output, live, computeDelay = 150, announc
   return {
     /** Re-score immediately (used when a sample is loaded). */
     update() { scheduled.cancel(); return render(); },
+    /** What a screen reader should hear about the current text. */
+    summary() { return lastResult ? analyzerSummary(lastResult) : ''; },
     destroy() { scheduled.cancel(); announce.cancel(); input.removeEventListener('input', scheduled); },
   };
 }

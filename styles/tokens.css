@@ -79,3 +79,14 @@
     --color-focus: #F9A8D4;         /* 10.3 / 9.6 / 8.4 */
   }
 }
+
+/* Users who ask their OS for more contrast get it automatically: no in-app setting to find.
+   Theme-agnostic (references other tokens), so it works in light and dark mode.
+   scripts/audit.js checks this theme and its dark-mode combination too. */
+@media (prefers-contrast: more) {
+  :root {
+    --color-text-muted: var(--color-text);
+    --color-border: var(--color-text);
+    --focus-ring: 4px solid var(--color-focus);
+  }
+}

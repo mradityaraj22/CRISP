@@ -435,6 +435,14 @@ export function mountRestructurer({ input, output, live }) {
 
   return {
     update() { clearTimeout(timer); return render(); },
+    /** What a screen reader should hear after the cards update. */
+    summary() {
+      if (!last || !last.result.cards.length) return 'No text to restructure.';
+      const points = last.result.cards.reduce((n, c) => n + c.points.length, 0);
+      const f = last.fidelity;
+      return `${points} points in ${last.result.cards.length} cards. ` +
+        (f.identical ? `All ${f.inputWords} words kept in order.` : 'Fidelity check failed.');
+    },
     get last() { return last; },
   };
 }
