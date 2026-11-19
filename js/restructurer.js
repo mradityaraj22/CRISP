@@ -23,16 +23,20 @@ const MIN_POINT_WORDS = 4;
  * Clause boundaries. The marker word stays at the START of the next point, so the
  * logic it carries ("although", "whereby", "since") is never lost.
  */
-const CLAUSE_SPLIT = /,\s+(?=(?:although|though|whereby|since|because|while|whereas|which|unless|but|yet|so that|rather than|where)\b)|;\s+|\s+[—–]\s+/gi;
+const CLAUSE_SPLIT = /,\s+(?=(?:although|though|whereby|wherein|since|because|while|whereas|which|unless|but|yet|so that|rather than|where)\b)|;\s+|\s+[—–]\s+/gi;
 
 /** Multi-word technical terms (anchor priority 3). */
 const PHRASES = [
   'race condition', 'critical section', 'mutual exclusion', 'context switches', 'context switch',
   'circular wait', 'forward progress', 'synchronization primitives', 'shared variable',
   'shared data', 'time quantum', 'mutable state', 'program semantics',
+  'priority queue', 'edge weights', 'distance estimate', 'inductive invariant', 'shortest-path distance',
 ];
 /** Generic phrases: useful as a last resort only (priority 1). */
 const WEAK_PHRASES = ['operating system'];
+
+/** Points starting like this depend on the previous point. */
+const DEPENDENT_START = /^(?:for which|in which|whereby|wherein|which|although|though|since|because|while|whereas|unless|but|yet|so that|rather than|where)\b/i;
 
 /** Words that signal a conclusion or definition. Used to pick the key takeaway. */
 const CUE_RE = /\b(consequently|therefore|thus|as a result|in summary|in short|key|important|must|means|we call|is called)\b/i;
@@ -130,6 +134,9 @@ function takeawayScore(text, jargon, isFirstCard) {
     return jargon.has(x) || jargon.has(x.replace(/(?:es|s)$/, ''));
   }).length;
   let score = 2 * jargonCount + (CUE_RE.test(text) ? 3 : 0) + (isFirstCard ? 1 : 0);
+  // A point that opens with a connector ("For which...", "Whereby...") leans on the point
+  // before it, so it cannot stand alone as a takeaway (Phase 7, Sample C).
+  if (DEPENDENT_START.test(text)) score -= 4;
   if (w.length < 6 || w.length > 24) score -= 5;
   return score;
 }

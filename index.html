@@ -43,17 +43,36 @@
     <!-- Input -->
     <section class="input-panel" aria-labelledby="input-heading">
       <h2 id="input-heading">Your text</h2>
-      <label for="source-text">Paste lecture notes, docs or handouts</label>
+
+      <!-- Phase 7: one-click presets ABOVE the text box, so first-time testers never face an empty box. -->
+      <div class="presets" role="group" aria-labelledby="presets-label">
+        <p id="presets-label" class="presets-label">Try a sample in one click</p>
+        <div class="preset-list">
+          <button type="button" class="preset" id="load-sample-a" data-sample="dense" aria-pressed="true">
+            <span class="preset-name">Sample A: OS Concurrency</span>
+            <span class="preset-blurb">Dense textbook paragraph</span>
+          </button>
+          <button type="button" class="preset" id="load-sample-b" data-sample="plain" aria-pressed="false">
+            <span class="preset-name">Sample B: Structured Version</span>
+            <span class="preset-blurb">Same ideas, plain English</span>
+          </button>
+          <button type="button" class="preset" id="load-sample-c" data-sample="algorithm" aria-pressed="false">
+            <span class="preset-name">Sample C: Dense Algorithm Handout</span>
+            <span class="preset-blurb">Dijkstra's shortest paths</span>
+          </button>
+          <button type="button" class="preset" id="load-sample-d" data-sample="messy" aria-pressed="false">
+            <span class="preset-name">Sample D: Messy Lecture Notes</span>
+            <span class="preset-blurb">Abbreviations, units, a URL</span>
+          </button>
+        </div>
+      </div>
+
+      <label for="source-text">Or paste your own lecture notes, docs or handouts</label>
       <textarea id="source-text" rows="9" spellcheck="true"
         aria-describedby="source-hint"></textarea>
       <div class="input-footer">
         <p id="source-hint" class="hint">Runs in your browser. Nothing is uploaded.
           <span id="word-count" class="word-count"></span></p>
-        <div class="actions" role="group" aria-label="Load a sample">
-          <button type="button" class="btn btn-secondary" id="load-sample-a">Load dense sample</button>
-          <button type="button" class="btn btn-secondary" id="load-sample-b">Load plain sample</button>
-          <button type="button" class="btn btn-secondary" id="load-sample-c">Load messy notes</button>
-        </div>
       </div>
     </section>
 

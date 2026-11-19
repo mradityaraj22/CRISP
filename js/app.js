@@ -25,6 +25,8 @@ const analyzer = mountAnalyzer({
   output: document.getElementById('analyzer-output'),
   live,
   announce: false, // the page-level announcer below speaks for the visible tab
+  // The verdict banner's button jumps straight to the fix (Phase 7).
+  onRestructure: () => selectTab(document.getElementById('tab-restructurer')),
 });
 
 // ---- Visual Simulator ----
@@ -62,7 +64,16 @@ textarea.addEventListener('input', () => {
   announceTimer = setTimeout(() => announce(activeModule().summary()), 1000);
 });
 
-function loadSample(sample) {
+const presets = [...document.querySelectorAll('.preset')];
+
+/** aria-pressed shows which sample is loaded; editing the text clears it. */
+function markPreset(key) {
+  for (const p of presets) p.setAttribute('aria-pressed', String(p.dataset.sample === key));
+}
+textarea.addEventListener('input', () => markPreset(null));
+
+function loadSample(sample, key) {
+  markPreset(key);
   textarea.value = sample.text;
   updateWordCount();
   analyzer.update();
@@ -72,9 +83,7 @@ function loadSample(sample) {
   announce(`Loaded ${sample.label}. ${activeModule().summary()}`);
 }
 
-document.getElementById('load-sample-a').addEventListener('click', () => loadSample(SAMPLES.dense));
-document.getElementById('load-sample-b').addEventListener('click', () => loadSample(SAMPLES.plain));
-document.getElementById('load-sample-c').addEventListener('click', () => loadSample(SAMPLES.messy));
+for (const p of presets) p.addEventListener('click', () => loadSample(SAMPLES[p.dataset.sample], p.dataset.sample));
 
 // ---- Tabs (WAI-ARIA Authoring Practices: automatic activation) ----
 const tabs = [...document.querySelectorAll('[role="tab"]')];

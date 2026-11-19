@@ -21,6 +21,9 @@ export const DEFAULT_JARGON = new Set([
   'latency', 'throughput', 'quantum', 'round-robin', 'kernel', 'syscall', 'cache',
   'pipeline', 'serialization', 'idempotent', 'abstraction', 'instantiation', 'traversal',
   'cpu', 'sjf', 'api', 'ram',
+  // Phase 7: graph algorithms (Sample C exposed the gap: jargon read 3.4% on a dense handout)
+  'graph', 'vertex', 'vertices', 'edge', 'weighted', 'directed', 'shortest-path', 'single-source',
+  'priority', 'queue', 'iteration', 'adjacent', 'inductive', 'bellman-ford', 'complexity', 'relaxation',
 ]);
 
 /**
@@ -277,7 +280,55 @@ export function frictionLevel(key, value) {
 }
 
 /* =========================================================================
-   8. Live browser UI
+   8. Plain-English verdicts (Phase 7: "What does Grade 24.0 mean I should do?")
+   ========================================================================= */
+
+/** Translate a Flesch-Kincaid grade into a reading level people recognise. */
+export function gradeMeaning(grade) {
+  if (grade <= 5) return 'Primary school level';
+  if (grade <= 8) return 'Middle school level';
+  if (grade <= 12) return 'High school level';
+  if (grade <= 16) return 'University level';
+  return 'Postgraduate level, beyond the scale';
+}
+
+const VERDICTS = {
+  high: { headline: 'Dense academic wall', action: 'Break it into shorter sentences, one idea each.' },
+  moderate: { headline: 'Readable with effort', action: 'Trim your longest sentences and add a few headings.' },
+  low: { headline: 'Clear and scannable', action: 'Short sentences and clear structure. Keep it this way.' },
+};
+
+/**
+ * One overall verdict plus up to three concrete fixes, worst problem first.
+ * Overall level = the worse of cognitive load and grade level.
+ */
+export function verdict(r) {
+  if (!r.wordCount) {
+    return { level: 'empty', headline: 'Nothing to check yet', action: 'Paste your text, or pick a sample above.', fixes: [] };
+  }
+  const rank = { low: 0, moderate: 1, high: 2 };
+  const levels = [frictionLevel('cognitiveLoad', r.cognitiveLoad), frictionLevel('fleschKincaidGrade', r.fleschKincaidGrade)];
+  const level = levels.sort((a, b) => rank[b] - rank[a])[0];
+
+  const fixes = [];
+  if (r.avgSentenceLength > FRICTION_SCALES.avgSentenceLength.high) {
+    fixes.push({ weight: r.avgSentenceLength / 12, text: `Your sentences average ${Math.round(r.avgSentenceLength)} words. Aim for 15 to 20.` });
+  }
+  if (r.jargonDensity > FRICTION_SCALES.jargonDensity.moderate) {
+    fixes.push({ weight: r.jargonDensity / 6, text: `${Math.round(r.jargonDensity)} in every 100 words are technical terms. Define each one the first time you use it.` });
+  }
+  if (r.passiveRatio >= 0.5 && r.sentenceCount > 1) {
+    fixes.push({ weight: 2 * r.passiveRatio, text: `${Math.round(r.passiveRatio * 100)}% of sentences are passive. Say who does what.` });
+  }
+  if (r.anchorsPer100Words === 0 && r.wordCount > 60) {
+    fixes.push({ weight: 1.5, text: 'There are no headings, bullet points or paragraph breaks. Add some so readers can scan.' });
+  }
+  fixes.sort((a, b) => b.weight - a.weight);
+  return { level, ...VERDICTS[level], fixes: level === 'low' ? [] : fixes.slice(0, 3).map((f) => f.text) };
+}
+
+/* =========================================================================
+   9. Live browser UI
    ========================================================================= */
 
 const LEVEL_TEXT = { low: 'Low friction', moderate: 'Moderate friction', high: 'High friction' };
@@ -371,19 +422,32 @@ function buildChart(svg, compact) {
   };
 }
 
+const LOAD_MEANING = {
+  low: 'Easy to take in on one read',
+  moderate: 'Takes some effort to follow',
+  high: 'Very hard to take in on one read',
+};
+
+/** Each card shows the number AND what it means in plain English (Phase 7 peer feedback). */
 const CARD_DEFS = [
-  { key: 'wordCount', label: 'Words', format: (r) => String(r.wordCount) },
-  { key: 'sentenceCount', label: 'Sentences', format: (r) => String(r.sentenceCount) },
-  { key: 'avgSentenceLength', label: 'Avg sentence length', format: (r) => `${r.avgSentenceLength.toFixed(1)} words` },
-  { key: 'fleschKincaidGrade', label: 'Flesch-Kincaid grade', format: (r) => r.fleschKincaidGrade.toFixed(1) },
-  { key: 'jargonDensity', label: 'Jargon density', format: (r) => `${r.jargonDensity.toFixed(1)}%` },
-  { key: 'cognitiveLoad', label: 'Cognitive load', format: (r) => `${r.cognitiveLoad} / 100` },
+  { key: 'wordCount', label: 'Words', format: (r) => String(r.wordCount),
+    meaning: (r) => `About ${Math.max(1, Math.round(r.wordCount / 200))} min to read` },
+  { key: 'sentenceCount', label: 'Sentences', format: (r) => String(r.sentenceCount),
+    meaning: (r) => (r.sentenceCount === 1 ? 'One unbroken block' : `${r.wordCount} words split ${r.sentenceCount} ways`) },
+  { key: 'avgSentenceLength', label: 'Avg sentence length', format: (r) => `${r.avgSentenceLength.toFixed(1)} words`,
+    meaning: () => 'Comfortable reading: 15 to 20 words' },
+  { key: 'fleschKincaidGrade', label: 'Flesch-Kincaid grade', format: (r) => r.fleschKincaidGrade.toFixed(1),
+    meaning: (r) => gradeMeaning(r.fleschKincaidGrade) },
+  { key: 'jargonDensity', label: 'Jargon density', format: (r) => `${r.jargonDensity.toFixed(1)}%`,
+    meaning: (r) => `${Math.round(r.jargonDensity)} technical terms in every 100 words` },
+  { key: 'cognitiveLoad', label: 'Cognitive load', format: (r) => `${r.cognitiveLoad} / 100`,
+    meaning: (r) => LOAD_MEANING[frictionLevel('cognitiveLoad', r.cognitiveLoad)] },
 ];
 
 /** The sentence a screen reader hears about a result. */
 export function analyzerSummary(r) {
   if (!r.wordCount) return 'No text to analyse.';
-  return `Grade ${r.fleschKincaidGrade.toFixed(1)}, ${LEVEL_TEXT[frictionLevel('fleschKincaidGrade', r.fleschKincaidGrade)].toLowerCase()}. ` +
+  return `${verdict(r).headline}. Grade ${r.fleschKincaidGrade.toFixed(1)}, ${LEVEL_TEXT[frictionLevel('fleschKincaidGrade', r.fleschKincaidGrade)].toLowerCase()}. ` +
     `Cognitive load ${r.cognitiveLoad} out of 100, ${LEVEL_TEXT[frictionLevel('cognitiveLoad', r.cognitiveLoad)].toLowerCase()}.`;
 }
 
@@ -395,9 +459,16 @@ export function analyzerSummary(r) {
  * @param {{ input: HTMLTextAreaElement, output: HTMLElement, live: HTMLElement,
  *           computeDelay?: number, announceDelay?: number, announce?: boolean }} opts
  */
-export function mountAnalyzer({ input, output, live, computeDelay = 150, announceDelay = 1000, announce: shouldAnnounce = true }) {
+export function mountAnalyzer({ input, output, live, computeDelay = 150, announceDelay = 1000, announce: shouldAnnounce = true, onRestructure = null }) {
   output.classList.remove('placeholder');
   output.innerHTML = `
+    <section class="verdict" aria-labelledby="verdict-headline">
+      <p class="verdict-kicker">Verdict</p>
+      <h4 id="verdict-headline" class="verdict-headline"></h4>
+      <p class="verdict-action"></p>
+      <ul class="verdict-fixes"></ul>
+      <button type="button" class="btn btn-primary verdict-cta" hidden>Restructure this text →</button>
+    </section>
     <div class="metric-grid" role="list"></div>
     <figure class="chart-card">
       <figcaption>
@@ -426,7 +497,7 @@ export function mountAnalyzer({ input, output, live, computeDelay = 150, announc
     const card = document.createElement('div');
     card.className = 'metric-card';
     card.setAttribute('role', 'listitem');
-    card.innerHTML = `<span class="metric-label"></span><span class="metric-value"></span><span class="badge" hidden></span>`;
+    card.innerHTML = `<span class="metric-label"></span><span class="metric-value"></span><span class="metric-meaning"></span><span class="badge" hidden></span>`;
     card.querySelector('.metric-label').textContent = def.label;
     grid.append(card);
     cards[def.key] = card;
@@ -451,6 +522,23 @@ export function mountAnalyzer({ input, output, live, computeDelay = 150, announc
   }
   const summary = output.querySelector('#chart-summary');
   const tbody = output.querySelector('.breakdown tbody');
+  const verdictBox = output.querySelector('.verdict');
+  const verdictCta = output.querySelector('.verdict-cta');
+  if (onRestructure) verdictCta.addEventListener('click', onRestructure);
+
+  function renderVerdict(r) {
+    const v = verdict(r);
+    const icon = { high: '▲', moderate: '◆', low: '●', empty: '○' }[v.level];
+    verdictBox.className = `verdict verdict-${v.level}`;
+    verdictBox.querySelector('.verdict-headline').textContent = `${icon} ${v.headline}`;
+    verdictBox.querySelector('.verdict-action').textContent = v.action;
+    verdictBox.querySelector('.verdict-fixes').replaceChildren(...v.fixes.map((t) => {
+      const li = document.createElement('li');
+      li.textContent = t;
+      return li;
+    }));
+    verdictCta.hidden = !onRestructure || v.level === 'low' || v.level === 'empty';
+  }
 
   let lastAnnouncement = '';
   const announce = debounce((r) => {
@@ -469,6 +557,7 @@ export function mountAnalyzer({ input, output, live, computeDelay = 150, announc
     for (const def of CARD_DEFS) {
       const card = cards[def.key];
       card.querySelector('.metric-value').textContent = r.wordCount ? def.format(r) : '–';
+      card.querySelector('.metric-meaning').textContent = r.wordCount ? def.meaning(r) : '';
       const badge = card.querySelector('.badge');
       if (def.key in FRICTION_SCALES && r.wordCount) {
         const level = frictionLevel(def.key, r[def.key]);
@@ -480,6 +569,7 @@ export function mountAnalyzer({ input, output, live, computeDelay = 150, announc
       }
     }
 
+    renderVerdict(r);
     lastResult = r;
     updateChart(r);
     summary.textContent = r.wordCount

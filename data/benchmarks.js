@@ -4,7 +4,8 @@
 export const SAMPLES = Object.freeze({
   dense: {
     id: 'A',
-    label: 'Sample A: Dense technical prose',
+    label: 'Sample A: OS Concurrency',
+    blurb: 'Dense textbook paragraph',
     text:
       'In multiprogrammed operating system environments, the concurrent execution of ' +
       'cooperating processes that share mutable state is required to be governed by ' +
@@ -21,7 +22,8 @@ export const SAMPLES = Object.freeze({
 
   plain: {
     id: 'B',
-    label: 'Sample B: Structured plain English',
+    label: 'Sample B: Structured Version',
+    blurb: 'Same ideas, plain English',
     text: [
       '**The problem: shared data.** Programs often run several threads at the same time. ' +
         'These threads can read and change the same data.',
@@ -39,11 +41,30 @@ export const SAMPLES = Object.freeze({
     ].join('\n'),
   },
 
-  // Phase 3: real-world lecture notes full of regex traps (abbreviations, decimals, a URL,
-  // an ellipsis, acronyms). It has exactly 5 sentences.
-  messy: {
+  // Phase 7: a second dense topic, so first-time testers see the problem is not OS-specific.
+  algorithm: {
     id: 'C',
-    label: 'Sample C: Messy lecture notes',
+    label: 'Sample C: Dense Algorithm Handout',
+    blurb: "Dijkstra's shortest paths",
+    text:
+      'Given a weighted directed graph with non-negative edge weights, the single-source ' +
+      "shortest-path problem is solved by Dijkstra's algorithm, wherein a priority queue keyed " +
+      'on tentative distances is maintained such that the vertex with minimal provisional ' +
+      'distance is extracted at each iteration and its outgoing edges are relaxed, whereby the ' +
+      'distance estimate of each adjacent vertex is decreased whenever a shorter path through ' +
+      'the extracted vertex is discovered. Correctness is established by an inductive invariant ' +
+      'asserting that every extracted vertex has attained its final shortest-path distance, ' +
+      'although it must be noted that this guarantee is invalidated in the presence of negative ' +
+      'edge weights, for which the Bellman-Ford algorithm, with its higher asymptotic ' +
+      'complexity, must instead be employed.',
+  },
+
+  // Phase 3: real-world lecture notes full of regex traps (abbreviations, decimals, a URL,
+  // an ellipsis, acronyms). It has exactly 5 sentences. (Called "Sample C" in Phases 3-5.)
+  messy: {
+    id: 'D',
+    label: 'Sample D: Messy Lecture Notes',
+    blurb: 'Abbreviations, units, a URL',
     expectedSentences: 5,
     text:
       "Dr. Rao's lecture covers CPU scheduling, e.g. round-robin and SJF, as shown in Fig. 2 on p. 14. " +

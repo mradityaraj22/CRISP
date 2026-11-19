@@ -107,3 +107,26 @@ export const KNOWN_LIMITS = [
 test('known limits are still what we documented', () => {
   for (const [word, counted] of KNOWN_LIMITS) assert.equal(countSyllables(word), counted, word);
 });
+
+// ---- Phase 7: plain-English verdicts ----
+import { verdict, gradeMeaning, analyzerSummary } from '../js/analyzer.js';
+
+test('verdicts turn numbers into a plain-English call to action', () => {
+  const a = verdict(analyze(SAMPLES.dense.text));
+  assert.equal(a.headline, 'Dense academic wall');
+  assert.match(a.fixes[0], /Your sentences average 43 words/);
+  assert.equal(verdict(analyze(SAMPLES.plain.text)).headline, 'Clear and scannable');
+  assert.equal(verdict(analyze(SAMPLES.algorithm.text)).level, 'high');
+  assert.equal(verdict(analyze('')).level, 'empty');
+});
+
+test('grade levels map to school stages people recognise', () => {
+  assert.deepEqual([2.6, 6.8, 11, 14, 24].map(gradeMeaning), [
+    'Primary school level', 'Middle school level', 'High school level', 'University level',
+    'Postgraduate level, beyond the scale',
+  ]);
+});
+
+test('the screen-reader summary leads with the verdict', () => {
+  assert.match(analyzerSummary(analyze(SAMPLES.dense.text)), /^Dense academic wall\. Grade 24\.0/);
+});
