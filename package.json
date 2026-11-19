@@ -1,0 +1,12 @@
+{
+  "name": "lecturelens",
+  "version": "0.1.0",
+  "description": "Cognitive load and visual accessibility simulator for dense technical and lecture content.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "benchmark": "node scripts/benchmark.js",
+    "serve": "python3 -m http.server 8080"
+  }
+}

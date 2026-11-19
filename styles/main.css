@@ -1,0 +1,82 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-3);
+  top: -100px;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  border-radius: var(--radius);
+}
+.skip-link:focus { top: var(--space-3); }
+
+:focus-visible { outline: var(--focus-ring); outline-offset: 2px; }
+
+.site-header, .site-footer, .layout {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-3);
+}
+.brand { font-size: var(--text-xl); margin: 0; }
+.tagline { color: var(--color-text-muted); margin: var(--space-1) 0 0; max-width: var(--measure); }
+
+.layout { display: grid; gap: var(--space-4); }
+@media (min-width: 900px) { .layout { grid-template-columns: 1fr 1fr; } }
+
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+}
+.panel h2 { font-size: var(--text-lg); margin-top: 0; }
+
+label { display: block; font-weight: 600; margin-bottom: var(--space-2); }
+textarea {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+}
+.hint { font-size: var(--text-sm); color: var(--color-text-muted); }
+
+.actions { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+button {
+  font: inherit;
+  min-height: 44px; /* touch target */
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  cursor: pointer;
+}
+
+.placeholder { color: var(--color-text-muted); font-style: italic; }
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.site-footer { color: var(--color-text-muted); font-size: var(--text-sm); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
