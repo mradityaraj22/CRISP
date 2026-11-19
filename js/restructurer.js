@@ -204,9 +204,118 @@ export function checkFidelity(original, result) {
   return { inputWords: input.length, outputWords: output.length, identical: firstMismatch === -1, firstMismatch };
 }
 
+
 /* =========================================================================
-   5. Live UI
+   5. Focus mode (bionic-style fixation emphasis)
    ========================================================================= */
+
+/**
+ * How many letters to bold at the start of a word. Short words get 1, long words ~40%.
+ * Research on fixation bolding is mixed, so the UI keeps this optional and off by default.
+ */
+export function fixationLength(word) {
+  const n = word.replace(/[^A-Za-z]/g, '').length;
+  if (n <= 3) return 1;
+  if (n === 4) return 2;
+  if (n <= 7) return 3;
+  return Math.ceil(n * 0.4);
+}
+
+/** A whole word, including hyphens and apostrophes inside it: non-deterministic, Rao's. */
+const WORD_RE = /[A-Za-z]+(?:['’-][A-Za-z]+)*/g;
+
+/**
+ * Safe text-node tokenizer. Works on PLAIN TEXT (one DOM text node), never on HTML,
+ * so tags, attributes and entities cannot be damaged.
+ * Returns segments whose texts concatenate back to the exact input.
+ * Skips: acronyms (CPU), single letters in abbreviations (e.g.), and anything with digits.
+ * @returns {{text: string, bold?: boolean}[]}
+ */
+export function focusSegments(text) {
+  const out = [];
+  let last = 0;
+  let m;
+  WORD_RE.lastIndex = 0;
+  while ((m = WORD_RE.exec(text))) {
+    const word = m[0];
+    const before = text[m.index - 1] ?? '';
+    const after = text[m.index + word.length] ?? '';
+    const isAcronym = /^[A-Z]{2,6}s?$/.test(word);
+    const isAbbrevLetter = word.length === 1 && (after === '.' || before === '.');
+    const touchesDigit = /\d/.test(before) || /\d/.test(after);
+    if (isAcronym || isAbbrevLetter || touchesDigit) continue;
+    const k = fixationLength(word);
+    if (m.index > last) out.push({ text: text.slice(last, m.index) });
+    out.push({ text: word.slice(0, k), bold: true });
+    if (k < word.length) out.push({ text: word.slice(k) });
+    last = m.index + word.length;
+  }
+  if (last < text.length) out.push({ text: text.slice(last) });
+  return out;
+}
+
+/* =========================================================================
+   6. Markdown export
+   ========================================================================= */
+
+export function toMarkdown(result) {
+  const lines = ['# Restructured notes', ''];
+  if (result.takeaway) lines.push(`> **Key takeaway:** ${result.takeaway.text}`, '');
+  for (const card of result.cards) {
+    lines.push(`## ${card.title}`, '');
+    for (const p of card.points) lines.push(`- ${p.anchor ? `**${p.anchor}:** ` : ''}${p.text}`);
+    lines.push('');
+  }
+  lines.push('_Restructured with LectureLens. Every word is from the original, in the same order._', '');
+  return lines.join('\n');
+}
+
+/* =========================================================================
+   7. Live UI
+   ========================================================================= */
+
+/** Apply Focus mode to every text node inside `root`, skipping code and existing bold. */
+export function applyFocus(root) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode: (node) => (node.parentElement.closest('code, strong, b, .no-focus')
+      ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+  });
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  for (const node of nodes) {
+    const frag = document.createDocumentFragment();
+    for (const seg of focusSegments(node.nodeValue)) {
+      if (seg.bold) {
+        const b = document.createElement('b');
+        b.className = 'fx';
+        b.textContent = seg.text;
+        frag.append(b);
+      } else {
+        frag.append(document.createTextNode(seg.text));
+      }
+    }
+    node.replaceWith(frag);
+  }
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    // Fallback for browsers or contexts without the async clipboard API.
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'absolute';
+    ta.style.left = '-9999px';
+    document.body.append(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    return ok;
+  }
+}
 
 /**
  * @param {{ input: HTMLTextAreaElement, output: HTMLElement, live: HTMLElement }} opts
@@ -214,7 +323,16 @@ export function checkFidelity(original, result) {
 export function mountRestructurer({ input, output, live }) {
   output.classList.remove('placeholder');
   output.innerHTML = `
-    <div class="rs-toolbar"></div>
+    <div class="rs-toolbar">
+      <label class="sim-check rs-focus-toggle">
+        <input type="checkbox" name="rs-focus" aria-describedby="rs-focus-hint"> Focus mode (bionic-style reading)
+      </label>
+      <div class="actions">
+        <button type="button" class="btn btn-secondary" data-action="copy">Copy as Markdown</button>
+        <button type="button" class="btn btn-secondary" data-action="download">Download .md</button>
+      </div>
+      <p id="rs-focus-hint" class="hint">Bolds the start of each word to guide your eyes. Research on this is mixed, so keep it only if it helps you.</p>
+    </div>
     <p class="rs-stats" aria-live="off"></p>
     <aside class="takeaway" aria-labelledby="takeaway-label">
       <p id="takeaway-label" class="takeaway-label">Key takeaway <span class="takeaway-source"></span></p>
@@ -229,6 +347,7 @@ export function mountRestructurer({ input, output, live }) {
   const takeawaySource = output.querySelector('.takeaway-source');
   const cardsEl = output.querySelector('.rs-cards');
   let last = null;
+  let focus = false;
 
   function render() {
     const text = input.value;
@@ -259,6 +378,9 @@ export function mountRestructurer({ input, output, live }) {
       return article;
     }));
 
+    if (focus) {
+      applyFocus(cardsEl);
+    }
     takeawayBox.hidden = !result.takeaway;
     if (result.takeaway) {
       takeawayText.textContent = result.takeaway.text;
@@ -275,8 +397,34 @@ export function mountRestructurer({ input, output, live }) {
           : `fidelity check failed at word ${fidelity.firstMismatch + 1}`)
       : 'Paste some text to restructure it.';
     output.dataset.fidelity = String(fidelity.identical);
+    if (focus) applyFocus(takeawayText);
     return last;
   }
+
+  output.querySelector('input[name="rs-focus"]').addEventListener('change', (e) => {
+    focus = e.target.checked;
+    render();
+    live.textContent = focus ? 'Focus mode on.' : 'Focus mode off.';
+  });
+
+  output.querySelector('.rs-toolbar').addEventListener('click', async (e) => {
+    const action = e.target.closest('button')?.dataset.action;
+    if (!action || !last) return;
+    const md = toMarkdown(last.result);
+    const count = last.result.cards.reduce((n, c) => n + c.points.length, 0);
+    if (action === 'copy') {
+      const ok = await copyText(md);
+      live.textContent = ok ? `Copied ${count} points as Markdown.` : 'Copy failed. Use Download instead.';
+    } else if (action === 'download') {
+      const url = URL.createObjectURL(new Blob([md], { type: 'text/markdown' }));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'lecturelens-notes.md';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      live.textContent = `Downloaded ${count} points as lecturelens-notes.md.`;
+    }
+  });
 
   let timer;
   input.addEventListener('input', () => {
@@ -288,8 +436,5 @@ export function mountRestructurer({ input, output, live }) {
   return {
     update() { clearTimeout(timer); return render(); },
     get last() { return last; },
-    toolbar: output.querySelector('.rs-toolbar'),
-    cards: cardsEl,
-    live,
   };
 }

@@ -60,3 +60,36 @@ test('empty input gives no cards and no takeaway', () => {
   assert.equal(r.cards.length, 0);
   assert.equal(r.takeaway, null);
 });
+
+// ---- Focus mode and export (Phase 5, second commit) ----
+import { focusSegments, fixationLength, toMarkdown } from '../js/restructurer.js';
+
+const join = (segs) => segs.map((s) => s.text).join('');
+const bolded = (segs) => segs.filter((s) => s.bold).map((s) => s.text);
+
+test('focus segments always rebuild the exact original text', () => {
+  for (const sample of Object.values(SAMPLES)) assert.equal(join(focusSegments(sample.text)), sample.text);
+});
+
+test('focus mode never touches the traps the naive regex broke', () => {
+  const segs = focusSegments("Dr. Rao's quantum of 2.5 ms, e.g. CPU & non-deterministic");
+  const b = bolded(segs);
+  assert.ok(b.includes('Ra'), "Rao's is one word");
+  assert.ok(!b.includes('s'), "the s in Rao's is not bolded on its own");
+  assert.ok(!b.includes('C') && !b.includes('CP'), 'acronyms stay plain');
+  assert.ok(!b.includes('e') && !b.includes('g'), 'e.g. stays plain');
+  assert.ok(b.includes('non-det') && !b.includes('de'), 'hyphenated word is one word');
+  assert.ok(!segs.some((s) => s.bold && /\d/.test(s.text)), 'numbers are never bolded');
+});
+
+test('fixation length grows with word length', () => {
+  assert.deepEqual(['a', 'lock', 'thread', 'algorithm', 'concurrency'].map(fixationLength), [1, 2, 3, 4, 5]);
+});
+
+test('markdown export contains every point verbatim', () => {
+  const r = restructure(SAMPLES.dense.text);
+  const md = toMarkdown(r);
+  for (const p of r.cards.flatMap((c) => c.points)) assert.ok(md.includes(p.text), p.text);
+  assert.match(md, /^# Restructured notes/);
+  assert.match(md, /> \*\*Key takeaway:\*\*/);
+});
