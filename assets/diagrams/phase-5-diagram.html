@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LectureLens Phase 5 Restructurer</title>
+<style>
+  :root { --navy: #041E42; --muted: #3E4C63; --green: #065F46; --red: #B91C1C; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #FFFFFF; color: var(--navy); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .card { max-width: 1020px; margin: 0 auto; padding: 32px 16px 24px; }
+  h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 20px; font-size: 0.975rem; }
+  svg { width: 100%; height: auto; display: block; }
+  .sec { font-size: 12.5px; font-weight: 700; fill: var(--green); letter-spacing: 0.06em; }
+  .h { font-size: 16px; font-weight: 700; fill: var(--navy); }
+  .in { font-size: 14px; fill: var(--navy); }
+  .mark { font-weight: 800; fill: var(--red); }
+  .t { font-size: 13px; fill: var(--muted); }
+  .tb { font-size: 13px; fill: var(--navy); }
+  .wc { font-size: 12px; font-weight: 700; fill: var(--green); }
+  .anchor { font-size: 14px; font-weight: 800; fill: var(--green); }
+  .card-title { font-size: 14px; font-weight: 800; fill: var(--navy); }
+  .li { font-size: 13px; fill: var(--navy); }
+  .lib { font-weight: 800; }
+  .fx { font-size: 14px; fill: var(--navy); }
+  .fxb { font-weight: 800; }
+  .ok { font-size: 15px; font-weight: 800; fill: var(--green); }
+  .no { font-size: 14px; font-weight: 700; fill: var(--red); }
+  .foot { color: var(--muted); font-size: 0.85rem; margin-top: 14px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>Three deterministic stages, zero rewritten words</h1>
+  <p class="sub">One real 45-word sentence from Sample A, traced through <code>js/restructurer.js</code>. No LLM, no network calls.</p>
+
+  <svg viewBox="0 0 1000 800" role="img" aria-labelledby="t d">
+    <title id="t">LectureLens Phase 5 restructuring pipeline</title>
+    <desc id="d">A 45-word sentence is split by the clause splitter at ", whereby" and at a middle comma into three points of 16, 5 and 24 words. The anchor extractor labels them Critical section, Race condition and Shared variable. The renderer builds a study card and can apply Focus mode. The fidelity check confirms 45 of 45 words kept in order with none added, and no LLM or network call is used.</desc>
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#041E42"/>
+      </marker>
+    </defs>
+
+    <!-- Input -->
+    <rect x="10" y="10" width="980" height="132" rx="14" fill="#FDF0F0" stroke="#B91C1C" stroke-width="1.5"/>
+    <text x="34" y="40" class="sec" style="fill:#B91C1C">INPUT · SAMPLE A, SENTENCE 2 · 45 WORDS IN ONE SENTENCE</text>
+    <text x="34" y="70" class="in">When a critical section is entered by more than one thread without mutual exclusion being <tspan class="mark">enforced,</tspan> a race condition</text>
+    <text x="34" y="94" class="in">is introduced<tspan class="mark">, whereby</tspan> the final value of the shared variable is determined by the arbitrary ordering of context switches</text>
+    <text x="34" y="118" class="in">rather than by the intended program semantics.</text>
+    <text x="640" y="118" class="t">Red = where the splitter cuts.</text>
+
+    <!-- Arrows down -->
+    <g stroke="#041E42" stroke-width="2.5" fill="none">
+      <path d="M170,142 V170" marker-end="url(#arrow)"/>
+    </g>
+
+    <!-- Stage 1 -->
+    <rect x="10" y="174" width="320" height="456" rx="14" fill="#FFFFFF" stroke="#041E42" stroke-width="1.5"/>
+    <text x="30" y="202" class="sec">STEP 1</text>
+    <text x="30" y="226" class="h">Clause Splitter</text>
+    <text x="30" y="250" class="t">Pass 1: cut at clause markers</text>
+    <text x="30" y="268" class="t">(", whereby" stays with the next point).</text>
+    <text x="30" y="290" class="t">Pass 2: points over 20 words are cut</text>
+    <text x="30" y="308" class="t">at the comma nearest the middle.</text>
+
+    <g transform="translate(30 330)">
+      <rect width="280" height="96" rx="8" fill="#F7F8FA" stroke="#6B7689"/>
+      <text x="12" y="22" class="wc">16 WORDS</text>
+      <text x="12" y="44" class="tb">When a critical section is entered</text>
+      <text x="12" y="62" class="tb">by more than one thread without</text>
+      <text x="12" y="80" class="tb">mutual exclusion being enforced</text>
+    </g>
+    <g transform="translate(30 436)">
+      <rect width="280" height="52" rx="8" fill="#F7F8FA" stroke="#6B7689"/>
+      <text x="12" y="22" class="wc">5 WORDS</text>
+      <text x="12" y="42" class="tb">A race condition is introduced</text>
+    </g>
+    <g transform="translate(30 498)">
+      <rect width="280" height="116" rx="8" fill="#F7F8FA" stroke="#6B7689"/>
+      <text x="12" y="22" class="wc">24 WORDS · NO COMMA TO CUT AT</text>
+      <text x="12" y="44" class="tb">Whereby the final value of the shared</text>
+      <text x="12" y="62" class="tb">variable is determined by the arbitrary</text>
+      <text x="12" y="80" class="tb">ordering of context switches rather</text>
+      <text x="12" y="98" class="tb">than by the intended program semantics.</text>
+    </g>
+
+    <!-- Stage 2 -->
+    <rect x="340" y="174" width="320" height="456" rx="14" fill="#FFFFFF" stroke="#041E42" stroke-width="1.5"/>
+    <text x="360" y="202" class="sec">STEP 2</text>
+    <text x="360" y="226" class="h">Semantic Anchor Extractor</text>
+    <text x="360" y="250" class="t">Picks the term that best names each</text>
+    <text x="360" y="268" class="t">point, copied from that point's own words.</text>
+
+    <text x="360" y="300" class="tb" style="font-weight:700">Priority</text>
+    <text x="360" y="322" class="t">1. technical phrase (race condition)</text>
+    <text x="360" y="342" class="t">2. jargon word (deadlock, mutex)</text>
+    <text x="360" y="362" class="t">3. longest content word (fallback)</text>
+    <text x="360" y="382" class="t">Acronyms keep their case: CPU.</text>
+
+    <line x1="360" y1="404" x2="640" y2="404" stroke="#D5DAE1"/>
+    <text x="360" y="436" class="anchor">Critical section</text>
+    <text x="520" y="436" class="t">phrase, point 1</text>
+    <text x="360" y="476" class="anchor">Race condition</text>
+    <text x="520" y="476" class="t">phrase, point 2</text>
+    <text x="360" y="516" class="anchor">Shared variable</text>
+    <text x="520" y="516" class="t">phrase, point 3</text>
+    <text x="360" y="566" class="t">Anchors are labels, not new content.</text>
+    <text x="360" y="586" class="t">The fidelity check ignores them.</text>
+
+    <!-- Stage 3 -->
+    <rect x="670" y="174" width="320" height="456" rx="14" fill="#ECF6F1" stroke="#065F46" stroke-width="2"/>
+    <text x="690" y="202" class="sec">STEP 3</text>
+    <text x="690" y="226" class="h">Card + Focus Mode Renderer</text>
+
+    <g transform="translate(690 246)">
+      <rect width="280" height="210" rx="8" fill="#FFFFFF" stroke="#6B7689"/>
+      <text x="14" y="26" class="card-title">Critical section</text>
+      <circle cx="18" cy="52" r="2.5" fill="#041E42"/>
+      <text x="28" y="56" class="li"><tspan class="lib">Critical section:</tspan> When a critical</text>
+      <text x="28" y="74" class="li">section is entered by more than one</text>
+      <text x="28" y="92" class="li">thread without mutual exclusion…</text>
+      <circle cx="18" cy="116" r="2.5" fill="#041E42"/>
+      <text x="28" y="120" class="li"><tspan class="lib">Race condition:</tspan> A race condition</text>
+      <text x="28" y="138" class="li">is introduced</text>
+      <circle cx="18" cy="162" r="2.5" fill="#041E42"/>
+      <text x="28" y="166" class="li"><tspan class="lib">Shared variable:</tspan> Whereby the final</text>
+      <text x="28" y="184" class="li">value of the shared variable is…</text>
+    </g>
+
+    <text x="690" y="484" class="tb" style="font-weight:700">Focus mode (optional)</text>
+    <text x="690" y="510" class="fx"><tspan class="fxb">A</tspan> <tspan class="fxb">ra</tspan>ce <tspan class="fxb">cond</tspan>ition <tspan class="fxb">i</tspan>s <tspan class="fxb">intr</tspan>oduced</text>
+    <text x="690" y="538" class="t">Tokenizes text nodes only, never HTML.</text>
+    <text x="690" y="558" class="t">Skips code, numbers, acronyms, e.g.</text>
+    <text x="690" y="590" class="t">Export: Copy as Markdown, Download .md</text>
+
+    <!-- Fidelity strip -->
+    <rect x="10" y="650" width="640" height="130" rx="14" fill="#ECF6F1" stroke="#065F46" stroke-width="2"/>
+    <text x="34" y="682" class="sec">FIDELITY CHECK · checkFidelity()</text>
+    <text x="34" y="714" class="ok">45 of 45 words kept, in the same order. 0 added.</text>
+    <text x="34" y="740" class="t">Allowed: splitting, labels, edge punctuation, first-letter capitals.</text>
+    <text x="34" y="760" class="t">Never: adding, dropping, reordering or paraphrasing a word.</text>
+
+    <rect x="670" y="650" width="320" height="130" rx="14" fill="#FDF0F0" stroke="#B91C1C" stroke-width="1.5" stroke-dasharray="7 5"/>
+    <text x="694" y="682" class="sec" style="fill:#B91C1C">NOT USED</text>
+    <text x="694" y="712" class="no">✕ No LLM paraphrasing</text>
+    <text x="694" y="736" class="no">✕ No invented definitions</text>
+    <text x="694" y="760" class="no">✕ No network calls</text>
+  </svg>
+
+  <p class="foot">Source: <code>js/restructurer.js</code> (chunkSentence, findAnchor, focusSegments, checkFidelity), tested in <code>scripts/test-restructurer.js</code>. Point lengths, anchors and the fidelity result are real program output.</p>
+</main>
+</body>
+</html>
