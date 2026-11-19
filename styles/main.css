@@ -140,6 +140,115 @@ textarea {
   text-align: center;
 }
 
+/* ---- Analyzer: metric cards ---- */
+/* 6 cards: 3 x 2 on wide screens, 2 x 3 on tablets, 1 column on small phones. */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+@media (min-width: 760px) { .metric-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 380px) { .metric-grid { grid-template-columns: 1fr; } }
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  min-width: 0;
+}
+.metric-label { font-size: var(--text-sm); color: var(--color-text-muted); font-weight: 600; }
+.metric-value {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  line-height: var(--leading-tight);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Friction badges: icon + words + colour, never colour alone. */
+.badge {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+  padding: 2px var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+  white-space: nowrap;
+}
+.badge[hidden] { display: none; }
+.badge-low { color: var(--color-clarity); background: var(--color-clarity-tint); }
+.badge-moderate { color: var(--color-text); background: var(--color-surface-alt); }
+.badge-high { color: var(--color-friction); background: var(--color-friction-tint); }
+
+/* ---- Analyzer: chart ---- */
+.chart-card {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+}
+.chart-card figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+.chart-title { font-weight: 700; }
+.chart-legend { display: flex; gap: var(--space-3); font-size: var(--text-sm); color: var(--color-text-muted); }
+.chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.swatch { display: inline-block; width: 14px; height: 14px; border-radius: 3px; }
+.swatch-low { background: var(--color-clarity); }
+.swatch-moderate { background: var(--color-accent); }
+.swatch-high {
+  background: repeating-linear-gradient(45deg, var(--color-friction) 0 4px, var(--color-friction-tint) 4px 6px);
+}
+
+.metric-chart { width: 100%; height: auto; display: block; overflow: visible; }
+.chart-label { font-size: 14px; font-weight: 600; fill: var(--color-text); }
+.chart-track { fill: var(--color-surface-alt); }
+.chart-threshold { stroke: var(--color-border); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.chart-tick { font-size: 11px; fill: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+.chart-value { font-size: 14px; font-weight: 700; fill: var(--color-text); font-variant-numeric: tabular-nums; }
+.bar-low { fill: var(--color-clarity); }
+.bar-moderate { fill: var(--color-accent); }
+.bar-high { fill: url(#ll-hatch); }
+.bar-high-fill { fill: var(--color-friction); }
+.bar-hatch-line { stroke: var(--color-surface); stroke-width: 1.6; stroke-opacity: 0.6; }
+.chart-summary { font-size: var(--text-sm); color: var(--color-text-muted); margin: var(--space-2) 0 0; }
+
+/* ---- Analyzer: score breakdown ---- */
+.breakdown { margin-bottom: var(--space-3); }
+.breakdown summary {
+  cursor: pointer;
+  font-weight: 600;
+  min-height: var(--tap-target);
+  display: flex;
+  align-items: center;
+}
+.breakdown table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+  margin-top: var(--space-2);
+}
+.breakdown th, .breakdown td {
+  text-align: left;
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+.breakdown .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.analyzer-note { font-size: var(--text-sm); color: var(--color-text-muted); margin: 0; }
+
 /* ---- Utilities ---- */
 .visually-hidden {
   position: absolute !important;
