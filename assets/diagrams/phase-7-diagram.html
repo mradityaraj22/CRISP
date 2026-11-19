@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LectureLens Phase 7 Feedback Loop</title>
+<style>
+  :root { --navy: #041E42; --muted: #3E4C63; --green: #065F46; --red: #B91C1C; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #FFFFFF; color: var(--navy); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .card { max-width: 1020px; margin: 0 auto; padding: 32px 16px 24px; }
+  h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 20px; font-size: 0.975rem; }
+  svg { width: 100%; height: auto; display: block; }
+  .colh { font-size: 13px; font-weight: 800; letter-spacing: 0.06em; }
+  .num { font-size: 13px; font-weight: 800; fill: var(--muted); letter-spacing: 0.04em; }
+  .quote { font-size: 15px; font-weight: 700; fill: var(--red); font-style: italic; }
+  .fb { font-size: 14.5px; font-weight: 700; fill: var(--red); }
+  .t { font-size: 13px; fill: var(--muted); }
+  .tb { font-size: 13.5px; fill: var(--navy); }
+  .spot { font-size: 14.5px; font-weight: 700; fill: var(--navy); }
+  .fix { font-size: 14.5px; font-weight: 700; fill: var(--green); }
+  .mono { font-size: 12px; fill: var(--muted); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .foot { color: var(--muted); font-size: 0.85rem; margin-top: 14px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>Peer feedback → my blind spot → the v2 fix</h1>
+  <p class="sub">Three issues from unmoderated peer testing, each traced to an assumption I made while coding alone.</p>
+
+  <svg viewBox="0 0 1000 640" role="img" aria-labelledby="t d">
+    <title id="t">LectureLens Phase 7 feedback to fix map</title>
+    <desc id="d">Three rows. One: a peer asked what Grade 24.0 means they should do; the blind spot was that I already knew what every metric meant; the fix was verdict banners such as Dense academic wall, break it into shorter sentences, plus a plain-English meaning under every number. Two: peers could not check the cards against their original text; the blind spot was that I trusted my own fidelity check; the fix was a side-by-side comparison with the longest sentence highlighted. Three: first-time testers did not know what to try; the blind spot was that I always had Sample A loaded while coding; the fix was four named one-click presets above the text box.</desc>
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#041E42"/>
+      </marker>
+    </defs>
+
+    <!-- Column headers -->
+    <text x="20" y="28" class="colh" style="fill:#B91C1C">PEER FEEDBACK</text>
+    <text x="355" y="28" class="colh" style="fill:#041E42">MY BLIND SPOT</text>
+    <text x="690" y="28" class="colh" style="fill:#065F46">v2 CODE FIX</text>
+
+    <!-- Row frames -->
+    <g>
+      <rect x="10" y="44" width="300" height="180" rx="12" fill="#FDF0F0" stroke="#B91C1C" stroke-width="1.5"/>
+      <rect x="345" y="44" width="300" height="180" rx="12" fill="#F7F8FA" stroke="#041E42" stroke-width="1.5"/>
+      <rect x="680" y="44" width="310" height="180" rx="12" fill="#ECF6F1" stroke="#065F46" stroke-width="2"/>
+
+      <rect x="10" y="244" width="300" height="180" rx="12" fill="#FDF0F0" stroke="#B91C1C" stroke-width="1.5"/>
+      <rect x="345" y="244" width="300" height="180" rx="12" fill="#F7F8FA" stroke="#041E42" stroke-width="1.5"/>
+      <rect x="680" y="244" width="310" height="180" rx="12" fill="#ECF6F1" stroke="#065F46" stroke-width="2"/>
+
+      <rect x="10" y="444" width="300" height="180" rx="12" fill="#FDF0F0" stroke="#B91C1C" stroke-width="1.5"/>
+      <rect x="345" y="444" width="300" height="180" rx="12" fill="#F7F8FA" stroke="#041E42" stroke-width="1.5"/>
+      <rect x="680" y="444" width="310" height="180" rx="12" fill="#ECF6F1" stroke="#065F46" stroke-width="2"/>
+    </g>
+
+    <!-- Arrows -->
+    <g stroke="#041E42" stroke-width="2.5" fill="none">
+      <path d="M312,134 H341" marker-end="url(#arrow)"/><path d="M647,134 H676" marker-end="url(#arrow)"/>
+      <path d="M312,334 H341" marker-end="url(#arrow)"/><path d="M647,334 H676" marker-end="url(#arrow)"/>
+      <path d="M312,534 H341" marker-end="url(#arrow)"/><path d="M647,534 H676" marker-end="url(#arrow)"/>
+    </g>
+
+    <!-- Row 1 -->
+    <text x="30" y="72" class="num">1 · RAW NUMBERS</text>
+    <text x="30" y="104" class="quote">“What does Grade 24.0</text>
+    <text x="30" y="126" class="quote">actually mean I should do?”</text>
+    <text x="30" y="160" class="t">The number was correct.</text>
+    <text x="30" y="180" class="t">It just did not tell anyone</text>
+    <text x="30" y="200" class="t">what to change.</text>
+
+    <text x="365" y="72" class="num">ASSUMPTION</text>
+    <text x="365" y="104" class="spot">I already knew what every</text>
+    <text x="365" y="126" class="spot">metric meant, so I never</text>
+    <text x="365" y="148" class="spot">explained one.</text>
+    <text x="365" y="182" class="t">My first reaction was to defend</text>
+    <text x="365" y="202" class="t">the formula, not the reader.</text>
+
+    <text x="700" y="72" class="num">feat(ux) · js/analyzer.js</text>
+    <text x="700" y="104" class="fix">▲ Dense academic wall</text>
+    <text x="700" y="126" class="tb">Break it into shorter sentences,</text>
+    <text x="700" y="146" class="tb">one idea each.</text>
+    <text x="700" y="172" class="t">24.0 → “Postgraduate level,</text>
+    <text x="700" y="190" class="t">beyond the scale”</text>
+    <text x="700" y="210" class="mono">verdict() · gradeMeaning()</text>
+
+    <!-- Row 2 -->
+    <text x="30" y="272" class="num">2 · HIDDEN ORIGINAL</text>
+    <text x="30" y="304" class="fb">Could not check the cards</text>
+    <text x="30" y="326" class="fb">against the original text.</text>
+    <text x="30" y="360" class="t">The cards replaced the source,</text>
+    <text x="30" y="380" class="t">so readers had to trust them.</text>
+
+    <text x="365" y="272" class="num">ASSUMPTION</text>
+    <text x="365" y="304" class="spot">My fidelity check proved</text>
+    <text x="365" y="326" class="spot">nothing was lost, so I</text>
+    <text x="365" y="348" class="spot">thought nobody needed to look.</text>
+    <text x="365" y="382" class="t">Proof I trust is not proof a</text>
+    <text x="365" y="402" class="t">reader can see.</text>
+
+    <text x="700" y="272" class="num">feat(diff) · js/restructurer.js</text>
+    <text x="700" y="304" class="fix">Before | After, side by side</text>
+    <text x="700" y="330" class="tb">128 words · 3 sentences ·</text>
+    <text x="700" y="350" class="tb">longest 48 words  →  9 points ·</text>
+    <text x="700" y="370" class="tb">longest 24 words</text>
+    <text x="700" y="394" class="t">Longest sentence highlighted,</text>
+    <text x="700" y="412" class="t">with a text label.</text>
+
+    <!-- Row 3 -->
+    <text x="30" y="472" class="num">3 · EMPTY-INPUT FRICTION</text>
+    <text x="30" y="504" class="fb">Did not know what to try,</text>
+    <text x="30" y="526" class="fb">or what the samples were.</text>
+    <text x="30" y="560" class="t">The old buttons sat below the</text>
+    <text x="30" y="580" class="t">text box, labelled “Load dense</text>
+    <text x="30" y="600" class="t">sample”.</text>
+
+    <text x="365" y="472" class="num">ASSUMPTION</text>
+    <text x="365" y="504" class="spot">Sample A was always loaded</text>
+    <text x="365" y="526" class="spot">while I coded, so I never felt</text>
+    <text x="365" y="548" class="spot">a first visit.</text>
+    <text x="365" y="582" class="t">The developer is the one user</text>
+    <text x="365" y="602" class="t">who is never new.</text>
+
+    <text x="700" y="472" class="num">feat(ux) · index.html</text>
+    <text x="700" y="504" class="fix">✓ Sample A: OS Concurrency</text>
+    <text x="700" y="530" class="tb">Four named presets ABOVE the</text>
+    <text x="700" y="550" class="tb">box, each with a one-line blurb.</text>
+    <text x="700" y="580" class="t">aria-pressed + ✓ show which</text>
+    <text x="700" y="600" class="t">one is loaded.</text>
+  </svg>
+
+  <p class="foot">Source: <code>index.html</code>, <code>js/analyzer.js</code>, <code>js/restructurer.js</code>, <code>styles/main.css</code>. Numbers are real output for Sample A.</p>
+</main>
+</body>
+</html>
