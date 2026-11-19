@@ -5,9 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="LectureLens: a cognitive load and visual accessibility simulator for dense technical and lecture content. Runs fully in your browser.">
   <title>LectureLens</title>
+  <meta name="theme-color" content="#041E42">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
   <link rel="stylesheet" href="styles/tokens.css">
   <link rel="stylesheet" href="styles/main.css">
   <script type="module" src="js/app.js"></script>
+  <script>
+    // Offline support (Phase 8). Service workers need http(s); skip quietly on file://.
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch((err) => console.warn('Offline mode unavailable:', err));
+      });
+    }
+  </script>
 </head>
 <body>
   <!-- Colour-vision deficiency filters (Machado et al., 2009, severity 1.0).
@@ -34,6 +46,7 @@
     <div class="wrap">
       <p class="brand">LectureLens</p>
       <p class="tagline">See how dense technical writing feels, then make it easier to read.</p>
+      <p id="net-status" class="net-status" role="status" hidden></p>
     </div>
   </header>
 

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="LectureLens">
+  <rect width="512" height="512" rx="96" fill="#041E42"/>
+  <!-- Lens over three lines of text; everything sits inside the 80% maskable safe zone. -->
+  <g fill="#FFFFFF">
+    <rect x="156" y="178" width="136" height="20" rx="10"/>
+    <rect x="156" y="214" width="112" height="20" rx="10"/>
+    <rect x="156" y="250" width="128" height="20" rx="10"/>
+  </g>
+  <circle cx="224" cy="224" r="120" fill="none" stroke="#FFFFFF" stroke-width="36"/>
+  <line x1="314" y1="314" x2="404" y2="404" stroke="#6EE7B7" stroke-width="48" stroke-linecap="round"/>
+</svg>

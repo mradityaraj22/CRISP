@@ -17,6 +17,7 @@ npm run serve        # then open http://localhost:8080
 npm run benchmark    # prints the Phase 1 readability comparison
 npm test             # runs all regression tests (no dependencies)
 npm run audit        # WCAG contrast + ARIA structure audit (exit code 1 on failure)
+npm run stamp        # re-hash sw.js after changing any cached file (offline cache version)
 ```
 
-ES modules do not load from `file://`, so use a local server.
+ES modules do not load from `file://`, so use a local server. After the first visit, LectureLens works fully offline (service worker in `sw.js`) and can be installed as an app.

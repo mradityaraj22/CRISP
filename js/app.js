@@ -85,6 +85,17 @@ function loadSample(sample, key) {
 
 for (const p of presets) p.addEventListener('click', () => loadSample(SAMPLES[p.dataset.sample], p.dataset.sample));
 
+// ---- Connection status (Phase 8) ----
+// A clear, calm state instead of silence: the tool keeps working offline, so say so.
+const netStatus = document.getElementById('net-status');
+function showNetwork() {
+  netStatus.hidden = navigator.onLine;
+  netStatus.textContent = navigator.onLine ? '' : '○ Offline. LectureLens keeps working from your device.';
+}
+window.addEventListener('online', showNetwork);
+window.addEventListener('offline', showNetwork);
+showNetwork();
+
 // ---- Tabs (WAI-ARIA Authoring Practices: automatic activation) ----
 const tabs = [...document.querySelectorAll('[role="tab"]')];
 

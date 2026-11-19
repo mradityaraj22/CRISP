@@ -7,8 +7,9 @@
   "license": "MIT",
   "scripts": {
     "benchmark": "node scripts/benchmark.js",
-    "test": "node --test scripts/test-analyzer.js scripts/test-simulator.js scripts/test-restructurer.js",
+    "test": "node --test scripts/test-analyzer.js scripts/test-simulator.js scripts/test-restructurer.js scripts/test-pwa.js",
     "audit": "node scripts/audit.js",
+    "stamp": "node scripts/stamp-sw.js",
     "serve": "python3 -m http.server 8080"
   }
 }
