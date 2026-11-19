@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="LectureLens: a cognitive load and visual accessibility simulator for dense technical and lecture content.">
+  <meta name="description" content="LectureLens: a cognitive load and visual accessibility simulator for dense technical and lecture content. Runs fully in your browser.">
   <title>LectureLens</title>
   <link rel="stylesheet" href="styles/tokens.css">
   <link rel="stylesheet" href="styles/main.css">
@@ -13,46 +13,70 @@
   <a class="skip-link" href="#main">Skip to main content</a>
 
   <header class="site-header">
-    <h1 class="brand">LectureLens</h1>
-    <p class="tagline">See how dense technical writing feels, then make it easier to read.</p>
+    <div class="wrap">
+      <p class="brand">LectureLens</p>
+      <p class="tagline">See how dense technical writing feels, then make it easier to read.</p>
+    </div>
   </header>
 
-  <main id="main" class="layout">
-    <section class="panel" aria-labelledby="input-heading">
-      <h2 id="input-heading">1. Paste your text</h2>
-      <label for="source-text">Lecture notes, docs or handouts</label>
-      <textarea id="source-text" rows="10" spellcheck="true"
+  <main id="main" class="wrap">
+    <h1 class="visually-hidden">LectureLens workspace</h1>
+
+    <!-- Input -->
+    <section class="input-panel" aria-labelledby="input-heading">
+      <h2 id="input-heading">Your text</h2>
+      <label for="source-text">Paste lecture notes, docs or handouts</label>
+      <textarea id="source-text" rows="9" spellcheck="true"
         aria-describedby="source-hint"></textarea>
-      <p id="source-hint" class="hint">Everything runs in your browser. Nothing is uploaded.</p>
-      <div class="actions">
-        <button type="button" id="load-sample-a">Load dense sample</button>
-        <button type="button" id="load-sample-b">Load plain-English sample</button>
+      <div class="input-footer">
+        <p id="source-hint" class="hint">Runs in your browser. Nothing is uploaded.
+          <span id="word-count" class="word-count"></span></p>
+        <div class="actions" role="group" aria-label="Load a sample">
+          <button type="button" class="btn btn-secondary" id="load-sample-a">Load dense sample</button>
+          <button type="button" class="btn btn-secondary" id="load-sample-b">Load plain sample</button>
+        </div>
       </div>
     </section>
 
-    <section class="panel" aria-labelledby="analyzer-heading">
-      <h2 id="analyzer-heading">2. Readability &amp; cognitive load</h2>
-      <!-- Phase 2: metrics grid + SVG comparison chart -->
-      <div id="analyzer-output" class="placeholder">Analyzer coming in Phase 2.</div>
-    </section>
+    <!-- Modules: WAI-ARIA tabs pattern -->
+    <section class="modules" aria-labelledby="modules-heading">
+      <h2 id="modules-heading" class="visually-hidden">Analysis modules</h2>
 
-    <section class="panel" aria-labelledby="simulator-heading">
-      <h2 id="simulator-heading">3. Accessibility simulator</h2>
-      <!-- Phase 3: Protanopia, Deuteranopia, Tritanopia, Glare, Dyslexia, ADHD modes -->
-      <div id="simulator-output" class="placeholder">Simulator coming in Phase 3.</div>
-    </section>
+      <div class="tablist" role="tablist" aria-label="LectureLens modules">
+        <button type="button" role="tab" id="tab-analyzer" aria-controls="panel-analyzer"
+          aria-selected="true" tabindex="0">Readability Analyzer</button>
+        <button type="button" role="tab" id="tab-simulator" aria-controls="panel-simulator"
+          aria-selected="false" tabindex="-1">Visual Simulator</button>
+        <button type="button" role="tab" id="tab-restructurer" aria-controls="panel-restructurer"
+          aria-selected="false" tabindex="-1">Plain-English Restructurer</button>
+      </div>
 
-    <section class="panel" aria-labelledby="restructurer-heading">
-      <h2 id="restructurer-heading">4. Scannable rewrite</h2>
-      <!-- Phase 4: chunked cards, key takeaways, Focus reading mode -->
-      <div id="restructurer-output" class="placeholder">Restructurer coming in Phase 4.</div>
+      <div role="tabpanel" id="panel-analyzer" aria-labelledby="tab-analyzer" tabindex="0" class="tabpanel">
+        <h3>Readability &amp; cognitive load</h3>
+        <p class="panel-lead">Grade level, sentence length, jargon density and an estimated cognitive load score, with a comparison chart.</p>
+        <div id="analyzer-output" class="placeholder">Coming in Phase 3.</div>
+      </div>
+
+      <div role="tabpanel" id="panel-simulator" aria-labelledby="tab-simulator" tabindex="0" class="tabpanel" hidden>
+        <h3>Visual &amp; sensory simulator</h3>
+        <p class="panel-lead">See your text with Protanopia, Deuteranopia, Tritanopia, low-brightness glare, Dyslexia and ADHD sensory overload.</p>
+        <div id="simulator-output" class="placeholder">Coming in Phases 4 and 5.</div>
+      </div>
+
+      <div role="tabpanel" id="panel-restructurer" aria-labelledby="tab-restructurer" tabindex="0" class="tabpanel" hidden>
+        <h3>Scannable rewrite</h3>
+        <p class="panel-lead">Dense prose turned into short cards with bold anchors, key takeaways and an optional Focus reading mode.</p>
+        <div id="restructurer-output" class="placeholder">Coming in Phases 6 and 7.</div>
+      </div>
     </section>
   </main>
 
   <div id="live-region" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
 
   <footer class="site-footer">
-    <p>Open source. Zero dependencies. Works offline.</p>
+    <div class="wrap">
+      <p>Open source. Zero dependencies. Works offline. No accounts, no tracking.</p>
+    </div>
   </footer>
 </body>
 </html>
