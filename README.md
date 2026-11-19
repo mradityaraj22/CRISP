@@ -16,9 +16,9 @@ LectureLens then tells you three things:
 
 Your text never leaves your computer. There is no account, no upload and no tracking. After the first visit, LectureLens keeps working with no internet at all.
 
-### Try it in 30 seconds
+### Try it
 
-1. Open LectureLens: **https://mradityaraj22.github.io/CRISP/** (or run it yourself, see [Run it on your own computer](#run-it-on-your-own-computer)).
+1. Open LectureLens on your own computer (two minutes, see [Run it on your own computer](#run-it-on-your-own-computer)).
 2. Click **"Sample A: OS Concurrency"** at the top. It is a real, dense textbook paragraph.
 3. Read the red **Verdict** box. Then click **"Restructure this text →"** to see the same paragraph as study cards.
 
