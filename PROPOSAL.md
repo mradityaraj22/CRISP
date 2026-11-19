@@ -126,3 +126,30 @@ See `assets/diagrams/phase-2-diagram.html` for the full diagram.
 - The app works with the network turned off.
 - Lighthouse accessibility score of 100 on the main page.
 - No runtime dependencies in the shipped code.
+
+## 10. Status at v1.0 (Phase 9 review)
+
+Added after the build. The plan above is kept unchanged as a record. This section compares it with what shipped.
+
+| # | Deliverable | Status | Evidence |
+|---|---|:-:|---|
+| D1 | Readability Analyzer | ✅ Done | Matches `npm run benchmark` exactly (golden test). Plain-English verdicts added in Phase 7. |
+| D2 | Metrics comparison chart | ✅ Done | Hatch + dot patterns and level words; survives every colour-vision filter. |
+| D3 | Colour-vision simulator | ⚠️ Partial | All four filters work in Chrome. Firefox and Safari not yet tested. |
+| D4 | Glare, Dyslexia and ADHD simulation | ⚠️ Partial | Glare and Dyslexia crowding done. **ADHD sensory overload not built.** |
+| D5 | WCAG contrast auditor | ⚠️ Partial | `scripts/audit.js` audits LectureLens's own 72 colour pairs. No checker for users' own colours yet. |
+| D6 | Plain-English Restructurer | ✅ Done | Fidelity check proves 100% of words kept, in order, on every sample. |
+| D7 | Focus reading mode | ✅ Done | Off by default; safe text-node tokenizer. |
+| D8 | Accessible shell | ✅ Done | 106/106 audit checks; keyboard and live-region bugs found by hand and fixed in Phase 6. |
+| D9 | Documentation | ✅ Done | README, this proposal, 9 diagrams, 9 devlogs, 9 Word blogs, CHANGELOG. |
+
+**Scope changes from the plan:** visual crowding moved from Phase 5 to Phase 4; the restructurer and Focus mode shipped together in Phase 5; Phase 6 became an accessibility audit, Phase 7 peer usability testing, and Phase 8 offline (PWA) hardening. Offline support was a design principle from the start (section 3) and became a real, tested service worker in Phase 8.
+
+**Success criteria (section 9):**
+
+- Deliverable checks: 6 of 9 fully met, 3 partial (above).
+- Works with the network off: ✅ verified with the local server switched off.
+- Lighthouse accessibility 100: ❌ **not measured yet.**
+- No runtime dependencies: ✅ 0.
+
+**Exclusions held:** no LLM APIs, no PDF-OCR backend, no accounts, no frameworks. The rule-based restructurer's fidelity check exists *because* the LLM was excluded.
