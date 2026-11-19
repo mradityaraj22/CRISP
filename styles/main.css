@@ -339,6 +339,34 @@ textarea {
 .cue-diff.cue-del { background: #F8C9C5; }
 .cue-diff.cue-add { background: #C3E6C6; }
 
+/* ---- Simulator: sensory stress ---- */
+.slide-frame { position: relative; border-radius: var(--radius); }
+
+/* Visual crowding / Dyslexia spacing stress: tight lines, squeezed letters, justified
+   "rivers" of white space and no comfortable line length. Baseline: 1.65, left-aligned. */
+.slide.stress-crowding { line-height: 1.15; letter-spacing: -0.02em; word-spacing: -0.05em; }
+.slide.stress-crowding .slide-text {
+  max-width: none;
+  margin-bottom: 0.25em;
+  text-align: justify;
+  text-align-last: left;
+  hyphens: none;
+}
+.slide.stress-crowding .slide-title { margin-bottom: 0.25em; }
+
+/* Low-brightness glare: washed-out ink plus a bright reflection over the screen. */
+.stress-glare .slide { color: color-mix(in srgb, var(--color-text) 55%, var(--color-surface)); opacity: 0.88; }
+.stress-glare::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 55% at 72% 22%, rgb(255 255 255 / 0.78), rgb(255 255 255 / 0) 70%),
+    linear-gradient(115deg, rgb(255 255 255 / 0) 35%, rgb(255 255 255 / 0.28) 50%, rgb(255 255 255 / 0) 65%);
+}
+
 /* Whole-page self-test: the same filter on everything the user sees. */
 html.sim-page .site-header,
 html.sim-page main,

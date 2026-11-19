@@ -1,4 +1,5 @@
 // Visual & Sensory Accessibility Simulator.
+// Phase 4: colour-vision filters, visual crowding (Dyslexia spacing stress) and screen glare.
 //
 // Like analyzer.js, this module has two layers:
 //   1. Pure colour maths (no DOM). Node uses it in scripts/test-simulator.js.
@@ -170,6 +171,11 @@ export function mountSimulator({ input, output, live }) {
         <legend>Colour vision</legend>
         <div class="sim-options"></div>
       </fieldset>
+      <fieldset class="sim-stress">
+        <legend>Sensory stress</legend>
+        <label class="sim-check"><input type="checkbox" name="sim-crowding"> Visual crowding (Dyslexia spacing stress)</label>
+        <label class="sim-check"><input type="checkbox" name="sim-glare"> Low-brightness screen glare</label>
+      </fieldset>
       <fieldset class="sim-scope">
         <legend>Self-test</legend>
         <label class="sim-check"><input type="checkbox" name="sim-page"> Apply the colour filter to the whole LectureLens page</label>
@@ -178,11 +184,11 @@ export function mountSimulator({ input, output, live }) {
     <div class="sim-compare">
       <section class="sim-pane" aria-labelledby="sim-base-h">
         <h4 id="sim-base-h">Accessible baseline</h4>
-        <div class="slide" tabindex="0" aria-label="Baseline preview, scrollable"></div>
+        <div class="slide-frame"><div class="slide" tabindex="0" aria-label="Baseline preview, scrollable"></div></div>
       </section>
       <section class="sim-pane" aria-labelledby="sim-sim-h">
         <h4 id="sim-sim-h">Simulated view <span class="sim-mode-label"></span></h4>
-        <div class="slide slide-simulated" tabindex="0" aria-label="Simulated preview, scrollable"></div>
+        <div class="slide-frame slide-frame-simulated"><div class="slide slide-simulated" tabindex="0" aria-label="Simulated preview, scrollable"></div></div>
       </section>
     </div>
     <p class="analyzer-note">Simulations are approximations based on Machado et al. (2009). Real vision varies from person to person.</p>`;
@@ -203,7 +209,8 @@ export function mountSimulator({ input, output, live }) {
   const [baseSlide, simSlide] = output.querySelectorAll('.slide');
   const modeLabel = output.querySelector('.sim-mode-label');
   const pageToggle = output.querySelector('input[name="sim-page"]');
-  const state = { cvd: 'none', page: false };
+  const simFrame = output.querySelector('.slide-frame-simulated');
+  const state = { cvd: 'none', page: false, crowding: false, glare: false };
 
   function renderSlides() {
     const blocks = input.value.split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean);
@@ -232,15 +239,24 @@ export function mountSimulator({ input, output, live }) {
   function applyFilters() {
     const filter = state.cvd === 'none' ? 'none' : `url(#cvd-${state.cvd})`;
     // In whole-page mode the page filter already covers this pane; filtering twice would distort it.
-    simSlide.style.filter = state.page ? 'none' : filter;
+    const parts = [];
+    if (!state.page && state.cvd !== 'none') parts.push(filter);
+    // Glare: a washed-out screen lowers contrast and lifts dark tones.
+    if (state.glare) parts.push('contrast(0.7) brightness(1.12)');
+    simSlide.style.filter = parts.join(' ') || 'none';
+    simSlide.classList.toggle('stress-crowding', state.crowding);
+    simFrame.classList.toggle('stress-glare', state.glare);
     document.documentElement.style.setProperty('--sim-page-filter', filter);
     document.documentElement.classList.toggle('sim-page', state.page && state.cvd !== 'none');
-    modeLabel.textContent = `(${CVD_MODES[state.cvd].label})`;
+    const extras = [state.crowding && 'crowding', state.glare && 'glare'].filter(Boolean);
+    modeLabel.textContent = `(${[CVD_MODES[state.cvd].label, ...extras].join(' + ')})`;
   }
 
   function announce() {
     const parts = [`Simulating ${CVD_MODES[state.cvd].label.toLowerCase()}`];
     if (state.page && state.cvd !== 'none') parts.push('on the whole page');
+    if (state.crowding) parts.push('with crowded spacing');
+    if (state.glare) parts.push('with screen glare');
     live.textContent = parts.join(', ') + '.';
   }
 
@@ -248,6 +264,8 @@ export function mountSimulator({ input, output, live }) {
     const t = e.target;
     if (t.name === 'sim-cvd') state.cvd = t.value;
     else if (t.name === 'sim-page') state.page = t.checked;
+    else if (t.name === 'sim-crowding') state.crowding = t.checked;
+    else if (t.name === 'sim-glare') state.glare = t.checked;
     else return;
     applyFilters();
     announce();
