@@ -331,9 +331,14 @@ export function mountRestructurer({ input, output, live }) {
   output.classList.remove('placeholder');
   output.innerHTML = `
     <div class="rs-toolbar">
-      <label class="sim-check rs-focus-toggle">
-        <input type="checkbox" name="rs-focus" aria-describedby="rs-focus-hint"> Focus mode (bionic-style reading)
-      </label>
+      <div class="rs-toggles">
+        <label class="sim-check rs-focus-toggle">
+          <input type="checkbox" name="rs-compare"> Compare with original, side by side
+        </label>
+        <label class="sim-check rs-focus-toggle">
+          <input type="checkbox" name="rs-focus" aria-describedby="rs-focus-hint"> Focus mode (bionic-style reading)
+        </label>
+      </div>
       <div class="actions">
         <button type="button" class="btn btn-secondary" data-action="copy">Copy as Markdown</button>
         <button type="button" class="btn btn-secondary" data-action="download">Download .md</button>
@@ -341,11 +346,22 @@ export function mountRestructurer({ input, output, live }) {
       <p id="rs-focus-hint" class="hint">Bolds the start of each word to guide your eyes. Research on this is mixed, so keep it only if it helps you.</p>
     </div>
     <p class="rs-stats" aria-live="off"></p>
-    <aside class="takeaway" aria-labelledby="takeaway-label">
-      <p id="takeaway-label" class="takeaway-label">Key takeaway <span class="takeaway-source"></span></p>
-      <p class="takeaway-text"></p>
-    </aside>
-    <div class="rs-cards"></div>
+    <div class="rs-compare">
+      <section class="rs-before" aria-labelledby="rs-before-h" hidden>
+        <h4 id="rs-before-h" class="rs-col-title">Before: original text</h4>
+        <p class="rs-col-stats rs-before-stats"></p>
+        <div class="rs-original" tabindex="0" aria-label="Original text, scrollable"></div>
+      </section>
+      <section class="rs-after" aria-labelledby="rs-after-h">
+        <h4 id="rs-after-h" class="rs-col-title" hidden>After: study cards</h4>
+        <p class="rs-col-stats rs-after-stats" hidden></p>
+        <aside class="takeaway" aria-labelledby="takeaway-label">
+          <p id="takeaway-label" class="takeaway-label">Key takeaway <span class="takeaway-source"></span></p>
+          <p class="takeaway-text"></p>
+        </aside>
+        <div class="rs-cards"></div>
+      </section>
+    </div>
     <p class="analyzer-note">Rule-based: every word comes from your text, in the same order. Nothing is rewritten or sent anywhere.</p>`;
 
   const stats = output.querySelector('.rs-stats');
@@ -353,6 +369,40 @@ export function mountRestructurer({ input, output, live }) {
   const takeawayText = output.querySelector('.takeaway-text');
   const takeawaySource = output.querySelector('.takeaway-source');
   const cardsEl = output.querySelector('.rs-cards');
+  const compareEl = output.querySelector('.rs-compare');
+  const beforeEl = output.querySelector('.rs-before');
+  const originalEl = output.querySelector('.rs-original');
+  const beforeStats = output.querySelector('.rs-before-stats');
+  const afterTitle = output.querySelector('#rs-after-h');
+  const afterStats = output.querySelector('.rs-after-stats');
+  let compare = false;
+
+  /**
+   * Phase 7 diff view: the original, untouched, with its longest sentence highlighted,
+   * so readers can check the cards against the source instead of trusting them.
+   */
+  function renderOriginal(text) {
+    const sentences = splitSentences(text, { keepNoise: true });
+    const longest = sentences.reduce((a, b) => (words(b).length > words(a).length ? b : a), '');
+    originalEl.replaceChildren(...text.split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean).map((block) => {
+      const p = document.createElement('p');
+      const plain = block.replace(/\*\*(.+?)\*\*/g, '$1').replace(/\n/g, ' ');
+      const at = longest ? plain.indexOf(longest) : -1;
+      if (at >= 0) {
+        const mark = document.createElement('mark');
+        mark.className = 'rs-longest';
+        mark.textContent = longest;
+        const label = document.createElement('span');
+        label.className = 'rs-longest-label';
+        label.textContent = ` ◀ longest sentence: ${words(longest).length} words`;
+        p.append(plain.slice(0, at), mark, label, plain.slice(at + longest.length));
+      } else {
+        p.textContent = plain;
+      }
+      return p;
+    }));
+    beforeStats.textContent = `${fidelityTokens(text).length} words · ${sentences.length} ${sentences.length === 1 ? 'sentence' : 'sentences'} · longest ${words(longest).length} words`;
+  }
   let last = null;
   let focus = false;
 
@@ -397,6 +447,8 @@ export function mountRestructurer({ input, output, live }) {
     const points = result.cards.flatMap((c) => c.points);
     const longest = Math.max(0, ...points.map((p) => words(p.text).length));
     const longestSentence = Math.max(0, ...splitSentences(text, { keepNoise: true }).map((s) => words(s).length));
+    afterStats.textContent = `${points.length} points in ${result.cards.length} cards · longest ${longest} words`;
+    if (compare) renderOriginal(text);
     stats.textContent = points.length
       ? `${points.length} points in ${result.cards.length} cards · longest point ${longest} words (longest sentence was ${longestSentence}) · ` +
         (fidelity.identical
@@ -407,6 +459,16 @@ export function mountRestructurer({ input, output, live }) {
     if (focus) applyFocus(takeawayText);
     return last;
   }
+
+  output.querySelector('input[name="rs-compare"]').addEventListener('change', (e) => {
+    compare = e.target.checked;
+    compareEl.classList.toggle('is-comparing', compare);
+    beforeEl.hidden = !compare;
+    afterTitle.hidden = !compare;
+    afterStats.hidden = !compare;
+    render();
+    live.textContent = compare ? 'Showing the original text beside the study cards.' : 'Showing study cards only.';
+  });
 
   output.querySelector('input[name="rs-focus"]').addEventListener('change', (e) => {
     focus = e.target.checked;

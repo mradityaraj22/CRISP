@@ -459,6 +459,41 @@ textarea {
 .rs-focus-toggle { font-weight: 600; }
 .rs-toolbar .hint { flex-basis: 100%; }
 
+.rs-toggles { display: flex; flex-wrap: wrap; gap: 0 var(--space-4); }
+
+/* ---- Phase 7: before / after comparison ---- */
+.rs-compare.is-comparing {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  align-items: start;
+}
+@media (min-width: 900px) { .rs-compare.is-comparing { grid-template-columns: 1fr 1fr; } }
+.rs-compare.is-comparing .rs-cards,
+.rs-compare.is-comparing .takeaway { max-width: none; }
+.rs-col-title { margin: 0 0 var(--space-1); font-size: var(--text-base); }
+.rs-col-stats { margin: 0 0 var(--space-3); font-size: var(--text-sm); color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+.rs-col-stats[hidden], .rs-col-title[hidden] { display: none; }
+.rs-original {
+  max-height: 44rem;
+  overflow: auto;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  line-height: 1.65;
+}
+.rs-original p { margin: 0 0 var(--space-3); }
+.rs-original p:last-child { margin-bottom: 0; }
+/* The longest sentence: tint + dashed underline + a text label, never colour alone. */
+.rs-longest {
+  background: var(--color-friction-tint);
+  color: var(--color-text);
+  text-decoration: underline dashed var(--color-friction);
+  text-underline-offset: 3px;
+}
+.rs-longest-label { font-size: var(--text-sm); font-weight: 700; color: var(--color-friction); }
+
 /* Focus mode: fixation letters in heavy weight, the rest slightly lighter. */
 .fx { font-weight: 800; }
 .rs-cards:has(.fx) li, .takeaway-text:has(.fx) { font-weight: 400; }
