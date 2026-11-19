@@ -434,6 +434,15 @@ textarea {
 .rs-card li { margin-bottom: var(--space-2); }
 .rs-card li:last-child { margin-bottom: 0; }
 .rs-anchor { color: var(--color-text); }
+/* In Focus mode every word is partly bold, so a bold anchor no longer stands out.
+   Give anchors a different SHAPE (own line, small caps label), not just a colour. */
+.rs-cards:has(.fx) .rs-anchor {
+  display: block;
+  font-size: var(--text-sm);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-clarity);
+}
 
 /* Whole-page self-test: the same filter on everything the user sees. */
 html.sim-page .site-header,
