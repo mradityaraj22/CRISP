@@ -175,9 +175,14 @@ export function auditHtml(html) {
    5. Source checks (status meaning, focus, motion)
    ========================================================================= */
 
-export function auditSource({ analyzer, css }) {
+export function auditSource({ analyzer, css, js = '' }) {
   const checks = [];
   const check = (name, pass, detail = '') => checks.push({ name, pass: Boolean(pass), detail });
+  // Phase 8 (XSS): user text must reach the page through textContent, never the HTML parser.
+  // Static markup in innerHTML is fine; a template literal with ${...} inside is not.
+  const unsafe = js.match(/(?:innerHTML\s*=|insertAdjacentHTML\([^,]+,)\s*`[^`]*\$\{/g) ?? [];
+  check('no innerHTML / insertAdjacentHTML built from variables (XSS)', unsafe.length === 0, unsafe.join(' | '));
+  check('no eval() or new Function()', !/\beval\(|new Function\(/.test(js));
   check('friction badges show icon + text, not colour alone', /\$\{LEVEL_ICON\[level\]\} \$\{LEVEL_TEXT\[level\]\}/.test(analyzer));
   check('chart bars carry a level word', /LEVEL_SHORT\[level\]/.test(analyzer));
   check('chart levels differ by pattern (hatch + dots)', analyzer.includes("'ll-hatch'") && analyzer.includes("'ll-dots'"));
@@ -199,7 +204,8 @@ if (isMain) {
   const tokens = read('styles/tokens.css');
   const contrast = auditContrast(tokens);
   const html = auditHtml(read('index.html'));
-  const source = auditSource({ analyzer: read('js/analyzer.js'), css: read('styles/main.css') + tokens });
+  const js = ['js/app.js', 'js/analyzer.js', 'js/simulator.js', 'js/restructurer.js', 'sw.js'].map(read).join('\n');
+  const source = auditSource({ analyzer: read('js/analyzer.js'), css: read('styles/main.css') + tokens, js });
 
   const mark = (ok) => (ok ? 'PASS' : 'FAIL');
   console.log('\nLectureLens accessibility audit\n');

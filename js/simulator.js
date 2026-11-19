@@ -9,6 +9,8 @@
 // Model for Simulation of Color Vision Deficiency", severity 1.0. They operate on LINEAR
 // RGB, which is why the SVG filters in index.html set color-interpolation-filters="linearRGB".
 
+import { limitWords, LIVE_WORD_LIMIT, LARGE_TEXT_CHARS } from './analyzer.js';
+
 /* =========================================================================
    1. Colour-vision deficiency (CVD) matrices
    ========================================================================= */
@@ -213,13 +215,22 @@ export function mountSimulator({ input, output, live }) {
   const state = { cvd: 'none', page: false, crowding: false, glare: false };
 
   function renderSlides() {
-    const blocks = input.value.split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean);
+    // Phase 8: two full previews of a 100,000-word paste would freeze the tab. Preview the
+    // first LIVE_WORD_LIMIT words (cut at a sentence end) and say so.
+    const limited = limitWords(input.value, LIVE_WORD_LIMIT);
+    const blocks = limited.text.split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean);
     for (const slide of [baseSlide, simSlide]) {
       slide.replaceChildren();
       const h = document.createElement('p');
       h.className = 'slide-title';
       h.textContent = 'Lecture slide preview';
       slide.append(h);
+      if (limited.truncated) {
+        const note = document.createElement('p');
+        note.className = 'limit-note';
+        note.textContent = `⚠ Previewing the first ${limited.keptWords.toLocaleString('en')} of ${limited.totalWords.toLocaleString('en')} words.`;
+        slide.append(note);
+      }
       if (!blocks.length) {
         const p = document.createElement('p');
         p.className = 'slide-empty';
@@ -274,7 +285,7 @@ export function mountSimulator({ input, output, live }) {
   let timer;
   input.addEventListener('input', () => {
     clearTimeout(timer);
-    timer = setTimeout(renderSlides, 150);
+    timer = setTimeout(renderSlides, input.value.length > LARGE_TEXT_CHARS ? 600 : 150);
   });
 
   renderSlides();

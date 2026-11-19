@@ -8,7 +8,7 @@
 // VERSION is a hash of every cached file: run `npm run stamp` after changing any of them.
 // scripts/test-pwa.js fails if the stamp is stale or a file the page needs is missing.
 
-const VERSION = 'lecturelens-c8b5858d49';
+const VERSION = 'lecturelens-ef69c39065';
 
 const ASSETS = [
   './',

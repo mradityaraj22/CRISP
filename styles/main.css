@@ -555,6 +555,21 @@ textarea {
   color: var(--color-clarity);
 }
 
+/* ---- Phase 8: hardening ---- */
+/* A 5,000-character URL or minified code line must wrap, never push the layout sideways. */
+.slide, .rs-card, .rs-original, .takeaway-text, .metric-value { overflow-wrap: anywhere; }
+.limit-note {
+  margin: 0 0 var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-surface-alt);
+  border: 1.5px solid var(--color-friction);
+  border-radius: var(--radius);
+}
+.limit-note[hidden] { display: none; }
+
 /* Whole-page self-test: the same filter on everything the user sees. */
 html.sim-page .site-header,
 html.sim-page main,

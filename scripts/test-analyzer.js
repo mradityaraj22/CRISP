@@ -130,3 +130,16 @@ test('grade levels map to school stages people recognise', () => {
 test('the screen-reader summary leads with the verdict', () => {
   assert.match(analyzerSummary(analyze(SAMPLES.dense.text)), /^Dense academic wall\. Grade 24\.0/);
 });
+
+// ---- Phase 8: Unicode and odd input ----
+test('accented and non-Latin words count as whole words; emoji are ignored', () => {
+  assert.deepEqual(tokenizeWords('Naïve café 🚀 résumé'), ['Naïve', 'café', 'résumé']);
+  assert.equal(tokenizeWords('नमस्ते दुनिया').length, 2);
+  assert.ok(countSyllables('नमस्ते') >= 1, 'non-Latin words are not counted as zero syllables');
+});
+
+test('odd inputs never throw', () => {
+  for (const t of ['🚀🚀🚀', '<<<>>>', 'x'.repeat(5000), '​​', '.....', '\t\n\r']) {
+    assert.doesNotThrow(() => analyze(t), JSON.stringify(t.slice(0, 10)));
+  }
+});

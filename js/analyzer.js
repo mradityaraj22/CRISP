@@ -155,10 +155,40 @@ export function splitSentences(text, { keepNoise = false } = {}) {
 export function tokenizeWords(text) {
   return clean(text)
     .replace(/\b(?:[A-Za-z]{1,3}\.){2,}/g, (abbr) => abbr.replace(/\./g, '')) // e.g. -> eg
-    .match(/[A-Za-z]+(?:[-'][A-Za-z]+)*/g) ?? [];
+    // Phase 8: any script's letters, plus combining marks. ASCII-only [A-Za-z] split
+    // "naïve" into "na" + "ve" and cut "café" to "caf". Emoji are not letters, so they are skipped.
+    .match(/[\p{L}\p{M}]+(?:['’-][\p{L}\p{M}]+)*/gu) ?? [];
+}
+
+/**
+ * Phase 8 large-paste guard. Returns the text cut to at most `max` words, ending at the
+ * last paragraph or sentence break before the limit when one is reasonably close.
+ * @returns {{ text: string, truncated: boolean, totalWords: number, keptWords: number }}
+ */
+export function limitWords(text, max) {
+  let count = 0;
+  let cut = -1;
+  const re = /\S+/g;
+  let m;
+  while ((m = re.exec(text))) {
+    count++;
+    if (count === max) cut = m.index + m[0].length;
+  }
+  if (count <= max) return { text, truncated: false, totalWords: count, keptWords: count };
+  const head = text.slice(0, cut);
+  const para = head.lastIndexOf('\n\n');
+  const sentence = Math.max(head.lastIndexOf('. '), head.lastIndexOf('? '), head.lastIndexOf('! '));
+  const boundary = para > cut * 0.8 ? para : sentence > cut * 0.8 ? sentence + 1 : cut;
+  const kept = text.slice(0, boundary).trimEnd();
+  return { text: kept, truncated: true, totalWords: count, keptWords: (kept.match(/\S+/g) ?? []).length };
 }
 
 const LETTER_SYLLABLES = { w: 3 };
+
+/** Above this many characters (~25,000 words) the UI slows its live updates. */
+export const LARGE_TEXT_CHARS = 150_000;
+/** The cards and preview render at most this many words, so huge pastes never freeze the tab. */
+export const LIVE_WORD_LIMIT = 20_000;
 
 /**
  * Heuristic English syllable counter. Accurate to roughly +/-1 grade level when used in
@@ -169,8 +199,10 @@ export function countSyllables(word) {
   if (/^[A-Z]{2,5}s?$/.test(word)) {
     return [...word.replace(/s$/, '').toLowerCase()].reduce((n, ch) => n + (LETTER_SYLLABLES[ch] ?? 1), 0);
   }
-  const w = word.toLowerCase().replace(/[^a-z]/g, '');
-  if (!w) return 0;
+  // Strip accents first (naïve -> naive). Words in non-Latin scripts count as one unit:
+  // the heuristic is English-only, and returning 0 would make text look simpler than it is.
+  const w = word.normalize('NFD').toLowerCase().replace(/[^a-z]/g, '');
+  if (!w) return /\p{L}/u.test(word) ? 1 : 0;
   if (w.length <= 3) return 1;
   const trimmed = w
     .replace(/(?:[^laeiouy]es|[^laeiouy]ed|[^laeiouy]e)$/, '') // silent trailing e / es / ed
@@ -591,7 +623,14 @@ export function mountAnalyzer({ input, output, live, computeDelay = 150, announc
     return r;
   }
 
-  const scheduled = debounce(render, computeDelay);
+  // Phase 8: wait longer between re-scores for very long pastes (over ~25,000 words),
+  // so typing never stutters.
+  let timer;
+  const scheduled = () => {
+    clearTimeout(timer);
+    timer = setTimeout(render, input.value.length > LARGE_TEXT_CHARS ? 600 : computeDelay);
+  };
+  scheduled.cancel = () => clearTimeout(timer);
   input.addEventListener('input', scheduled);
   render();
 

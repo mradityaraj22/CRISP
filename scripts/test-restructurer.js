@@ -93,3 +93,56 @@ test('markdown export contains every point verbatim', () => {
   assert.match(md, /^# Restructured notes/);
   assert.match(md, /> \*\*Key takeaway:\*\*/);
 });
+
+// ---- Phase 8: hardening ----
+import { escapeMarkdown } from '../js/restructurer.js';
+import { limitWords, LIVE_WORD_LIMIT } from '../js/analyzer.js';
+
+/** What a Markdown renderer shows for our escaped text: entities and backslashes undone. */
+const renderMd = (s) => s.replace(/\\([\\`*_[\]#>+\-])/g, '$1').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+
+const CPP = 'In C++ you write #include <vector> before std::vector<int> v when 3 < 5 && a*b_c > 2.';
+
+test('markdown export keeps <vector> visible instead of letting renderers eat it', () => {
+  const esc = escapeMarkdown(CPP);
+  assert.ok(!/<vector>|<int>/.test(esc), 'raw tags must not reach the Markdown');
+  assert.equal(renderMd(esc), CPP, 'renders back to exactly the original characters');
+});
+
+test('pasted <script> and event handlers are neutralised in the export', () => {
+  const esc = escapeMarkdown('<script>alert(1)</script> <b onmouseover="x()">hi</b>');
+  assert.ok(!esc.includes('<'), esc);
+});
+
+test('a full restructure of HTML/C++ text keeps fidelity and escapes the export', () => {
+  const r = restructure(CPP);
+  assert.ok(checkFidelity(CPP, r).identical);
+  assert.ok(toMarkdown(r).includes('&lt;vector&gt;'));
+});
+
+test('focus mode handles accented and non-Latin words as whole words', () => {
+  const segs = focusSegments('Naïve café ideas, 🚀 naïve again');
+  assert.equal(segs.map((s) => s.text).join(''), 'Naïve café ideas, 🚀 naïve again');
+  assert.ok(segs.some((s) => s.bold && s.text === 'Naï'), JSON.stringify(segs));
+  assert.ok(!segs.some((s) => s.bold && /🚀/.test(s.text)), 'emoji are never bolded');
+});
+
+test('limitWords cuts huge text at a sentence end and reports the totals', () => {
+  const big = Array(200).fill(SAMPLES.dense.text).join(' '); // 25,600 words
+  const l = limitWords(big, LIVE_WORD_LIMIT);
+  assert.equal(l.truncated, true);
+  assert.equal(l.totalWords, 25600);
+  assert.ok(l.keptWords <= LIVE_WORD_LIMIT && l.keptWords > LIVE_WORD_LIMIT * 0.8);
+  assert.match(l.text, /[.!?]$/, 'ends at a full sentence');
+  assert.equal(limitWords('short text', 10).truncated, false);
+});
+
+test('a 100,000-word paste restructures (after the limit) in well under a second', () => {
+  const big = Array(782).fill(SAMPLES.dense.text).join('\n\n');
+  const t0 = performance.now();
+  const l = limitWords(big, LIVE_WORD_LIMIT);
+  const r = restructure(l.text);
+  checkFidelity(l.text, r);
+  const ms = performance.now() - t0;
+  assert.ok(ms < 500, `took ${ms.toFixed(0)} ms`);
+});

@@ -8,7 +8,7 @@
 //   1. Pure functions (no DOM). Node tests them in scripts/test-restructurer.js.
 //   2. mountRestructurer(): the live UI.
 
-import { splitSentences, DEFAULT_JARGON } from './analyzer.js';
+import { splitSentences, DEFAULT_JARGON, limitWords, LIVE_WORD_LIMIT, LARGE_TEXT_CHARS } from './analyzer.js';
 
 /* =========================================================================
    1. Settings
@@ -221,7 +221,7 @@ export function checkFidelity(original, result) {
  * Research on fixation bolding is mixed, so the UI keeps this optional and off by default.
  */
 export function fixationLength(word) {
-  const n = word.replace(/[^A-Za-z]/g, '').length;
+  const n = word.replace(/[^\p{L}]/gu, '').length; // any script, not just A-Z (Phase 8)
   if (n <= 3) return 1;
   if (n === 4) return 2;
   if (n <= 7) return 3;
@@ -229,7 +229,7 @@ export function fixationLength(word) {
 }
 
 /** A whole word, including hyphens and apostrophes inside it: non-deterministic, Rao's. */
-const WORD_RE = /[A-Za-z]+(?:['’-][A-Za-z]+)*/g;
+const WORD_RE = /[\p{L}\p{M}]+(?:['’-][\p{L}\p{M}]+)*/gu; // Unicode-aware since Phase 8
 
 /**
  * Safe text-node tokenizer. Works on PLAIN TEXT (one DOM text node), never on HTML,
@@ -265,12 +265,30 @@ export function focusSegments(text) {
    6. Markdown export
    ========================================================================= */
 
+/** Escape the three characters an HTML or Markdown renderer would treat as markup. */
+export function escapeHTML(text) {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/**
+ * Make user text safe to drop into Markdown (Phase 8). Without this, a pasted C++ line like
+ * `#include <vector>` exported as raw Markdown, and any renderer (GitHub, VS Code, Notion)
+ * read <vector> as an HTML tag and deleted it. <script> could be worse in a careless renderer.
+ * Entities and backslash escapes render back to exactly the original characters.
+ */
+export function escapeMarkdown(text) {
+  return escapeHTML(text)
+    .replace(/([\\`*_[\]])/g, '\\$1')
+    .replace(/^(#{1,6}\s|[-+]\s|\d+[.)]\s|>)/, '\\$1');
+}
+
 export function toMarkdown(result) {
+  const md = escapeMarkdown;
   const lines = ['# Restructured notes', ''];
-  if (result.takeaway) lines.push(`> **Key takeaway:** ${result.takeaway.text}`, '');
+  if (result.takeaway) lines.push(`> **Key takeaway:** ${md(result.takeaway.text)}`, '');
   for (const card of result.cards) {
-    lines.push(`## ${card.title}`, '');
-    for (const p of card.points) lines.push(`- ${p.anchor ? `**${p.anchor}:** ` : ''}${p.text}`);
+    lines.push(`## ${md(card.title)}`, '');
+    for (const p of card.points) lines.push(`- ${p.anchor ? `**${md(p.anchor)}:** ` : ''}${md(p.text)}`);
     lines.push('');
   }
   lines.push('_Restructured with LectureLens. Every word is from the original, in the same order._', '');
@@ -345,6 +363,7 @@ export function mountRestructurer({ input, output, live }) {
       </div>
       <p id="rs-focus-hint" class="hint">Bolds the start of each word to guide your eyes. Research on this is mixed, so keep it only if it helps you.</p>
     </div>
+    <p class="limit-note" hidden></p>
     <p class="rs-stats" aria-live="off"></p>
     <div class="rs-compare">
       <section class="rs-before" aria-labelledby="rs-before-h" hidden>
@@ -406,8 +425,19 @@ export function mountRestructurer({ input, output, live }) {
   let last = null;
   let focus = false;
 
+  const limitNote = output.querySelector('.limit-note');
+
   function render() {
-    const text = input.value;
+    // Phase 8: huge pastes render only the first LIVE_WORD_LIMIT words, cut at a sentence
+    // or paragraph end, and say so clearly instead of freezing the tab.
+    const limited = limitWords(input.value, LIVE_WORD_LIMIT);
+    const text = limited.text;
+    limitNote.hidden = !limited.truncated;
+    limitNote.textContent = limited.truncated
+      ? `⚠ Long text: ${limited.totalWords.toLocaleString('en')} words. To keep your browser responsive, the cards ` +
+        `show the first ${limited.keptWords.toLocaleString('en')} words, ending at a full sentence. ` +
+        'For the rest, paste the document one chapter at a time.'
+      : '';
     const result = restructure(text);
     const fidelity = checkFidelity(text, result);
     last = { text, result, fidelity };
@@ -498,7 +528,7 @@ export function mountRestructurer({ input, output, live }) {
   let timer;
   input.addEventListener('input', () => {
     clearTimeout(timer);
-    timer = setTimeout(render, 150);
+    timer = setTimeout(render, input.value.length > LARGE_TEXT_CHARS ? 600 : 150);
   });
   render();
 
