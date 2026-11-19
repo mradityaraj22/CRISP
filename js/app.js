@@ -2,6 +2,7 @@
 import { SAMPLES } from '../data/benchmarks.js';
 import { tokenizeWords, mountAnalyzer } from './analyzer.js';
 import { mountSimulator } from './simulator.js';
+import { mountRestructurer } from './restructurer.js';
 
 const textarea = document.getElementById('source-text');
 const live = document.getElementById('live-region');
@@ -32,11 +33,19 @@ const simulator = mountSimulator({
   live,
 });
 
+// ---- Plain-English Restructurer ----
+const restructurer = mountRestructurer({
+  input: textarea,
+  output: document.getElementById('restructurer-output'),
+  live,
+});
+
 function loadSample(sample) {
   textarea.value = sample.text;
   updateWordCount();
   analyzer.update();
   simulator.update();
+  restructurer.update();
   live.textContent = `Loaded ${sample.label}.`;
 }
 

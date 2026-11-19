@@ -117,10 +117,16 @@ function isSentenceEnd(block, start, end, punct) {
   return true;
 }
 
-export function splitSentences(text) {
+/**
+ * @param {string} text
+ * @param {{ keepNoise?: boolean }} [opts] keepNoise: leave URLs, emails and code untouched
+ *   (the restructurer needs the reader's exact words; scoring does not).
+ */
+export function splitSentences(text, { keepNoise = false } = {}) {
   const sentences = [];
+  const prepared = keepNoise ? stripMarkdown(text) : clean(text);
   // Line breaks always end a sentence, so headings and bullet points stay separate.
-  for (const block of clean(text).split(/\n+/)) {
+  for (const block of prepared.split(/\n+/)) {
     let start = 0;
     const blockEnd = block.trimEnd().length;
     const terminator = /[.!?]+['")\]]*(?=\s|$)/g;
