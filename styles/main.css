@@ -249,6 +249,101 @@ textarea {
 .breakdown .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .analyzer-note { font-size: var(--text-sm); color: var(--color-text-muted); margin: 0; }
 
+/* ---- Simulator: controls ---- */
+.sim-controls { display: grid; gap: var(--space-3); margin-bottom: var(--space-4); }
+.sim-controls fieldset {
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+.sim-controls legend { font-weight: 700; padding: 0 var(--space-1); }
+.sim-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
+  gap: var(--space-2);
+}
+.sim-radio {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  min-height: var(--tap-target);
+  padding: var(--space-2);
+  margin: 0;
+  font-weight: 400;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.sim-radio:has(input:checked) { border-color: var(--color-accent); background: var(--color-surface-alt); }
+.sim-radio:has(input:focus-visible) { outline: var(--focus-ring); outline-offset: 2px; }
+.sim-radio input { margin-top: 0.3em; accent-color: var(--color-accent); }
+.sim-radio-text { display: flex; flex-direction: column; line-height: var(--leading-tight); }
+.sim-radio-text small { color: var(--color-text-muted); font-size: var(--text-sm); margin-top: 2px; }
+.sim-check {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  min-height: var(--tap-target);
+  margin: 0;
+  font-weight: 400;
+  cursor: pointer;
+}
+.sim-check input { width: 1.15rem; height: 1.15rem; accent-color: var(--color-accent); }
+
+/* ---- Simulator: side-by-side preview ---- */
+.sim-compare {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+@media (min-width: 860px) { .sim-compare { grid-template-columns: 1fr 1fr; } }
+.sim-pane h4 { margin: 0 0 var(--space-2); font-size: var(--text-base); }
+.sim-mode-label { color: var(--color-text-muted); font-weight: 600; }
+
+/* The accessible baseline typography every simulation is compared against. */
+.slide {
+  position: relative;
+  max-height: 30rem;
+  overflow: auto;
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  line-height: 1.65;
+  text-align: left;
+}
+.slide-title { font-size: var(--text-lg); font-weight: 800; margin: 0 0 var(--space-3); }
+.slide-text { margin: 0 0 var(--space-3); max-width: var(--measure); }
+.slide-empty { color: var(--color-text-muted); font-style: italic; }
+
+/* ---- Simulator: colour-cue strip ---- */
+.cues { border-top: 1px dashed var(--color-border); margin-top: var(--space-3); padding-top: var(--space-3); }
+.cue-title { font-size: var(--text-sm); font-weight: 700; color: var(--color-text-muted); margin: var(--space-2) 0 var(--space-1); }
+.cue-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+/* Typical slide-deck red and green, deliberately NOT our tokens: this is what we are testing. */
+.cue-dot { display: inline-block; width: 1.25rem; height: 1.25rem; border-radius: 50%; }
+.cue-dot.cue-bad { background: #D32F2F; }
+.cue-dot.cue-good { background: #2E7D32; }
+.cue-tag { padding: 2px var(--space-2); border-radius: var(--radius-sm); font-size: var(--text-sm); font-weight: 700; color: #FFFFFF; }
+.cue-tag.cue-bad { background: #C62828; }
+.cue-tag.cue-good { background: #2E7D32; }
+.cue-diff {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  color: #1A1A1A;
+}
+.cue-diff.cue-del { background: #F8C9C5; }
+.cue-diff.cue-add { background: #C3E6C6; }
+
+/* Whole-page self-test: the same filter on everything the user sees. */
+html.sim-page .site-header,
+html.sim-page main,
+html.sim-page .site-footer { filter: var(--sim-page-filter); }
+
 /* ---- Utilities ---- */
 .visually-hidden {
   position: absolute !important;

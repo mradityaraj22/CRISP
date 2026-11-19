@@ -1,6 +1,7 @@
 // UI entry point. Wires the DOM to the modules. No logic that needs testing lives here.
 import { SAMPLES } from '../data/benchmarks.js';
 import { tokenizeWords, mountAnalyzer } from './analyzer.js';
+import { mountSimulator } from './simulator.js';
 
 const textarea = document.getElementById('source-text');
 const live = document.getElementById('live-region');
@@ -24,10 +25,18 @@ const analyzer = mountAnalyzer({
   live,
 });
 
+// ---- Visual Simulator ----
+const simulator = mountSimulator({
+  input: textarea,
+  output: document.getElementById('simulator-output'),
+  live,
+});
+
 function loadSample(sample) {
   textarea.value = sample.text;
   updateWordCount();
   analyzer.update();
+  simulator.update();
   live.textContent = `Loaded ${sample.label}.`;
 }
 

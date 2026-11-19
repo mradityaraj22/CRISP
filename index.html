@@ -10,6 +10,24 @@
   <script type="module" src="js/app.js"></script>
 </head>
 <body>
+  <!-- Colour-vision deficiency filters (Machado et al., 2009, severity 1.0).
+       Matrices operate on linear RGB, so color-interpolation-filters is set explicitly.
+       Source of truth: CVD_MODES in js/simulator.js (scripts/test-simulator.js checks they match). -->
+  <svg id="cvd-filters" class="visually-hidden" aria-hidden="true" focusable="false" width="0" height="0">
+    <filter id="cvd-protanopia" color-interpolation-filters="linearRGB">
+      <feColorMatrix type="matrix" values="0.152286 1.052583 -0.204868 0 0  0.114503 0.786281 0.099216 0 0  -0.003882 -0.048116 1.051998 0 0  0 0 0 1 0"/>
+    </filter>
+    <filter id="cvd-deuteranopia" color-interpolation-filters="linearRGB">
+      <feColorMatrix type="matrix" values="0.367322 0.860646 -0.227968 0 0  0.280085 0.672501 0.047413 0 0  -0.01182 0.04294 0.968881 0 0  0 0 0 1 0"/>
+    </filter>
+    <filter id="cvd-tritanopia" color-interpolation-filters="linearRGB">
+      <feColorMatrix type="matrix" values="1.255528 -0.076749 -0.178779 0 0  -0.078411 0.930809 0.147602 0 0  0.004733 0.691367 0.3039 0 0  0 0 0 1 0"/>
+    </filter>
+    <filter id="cvd-achromatopsia" color-interpolation-filters="linearRGB">
+      <feColorMatrix type="matrix" values="0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0.2126 0.7152 0.0722 0 0  0 0 0 1 0"/>
+    </filter>
+  </svg>
+
   <a class="skip-link" href="#main">Skip to main content</a>
 
   <header class="site-header">
@@ -60,8 +78,8 @@
 
       <div role="tabpanel" id="panel-simulator" aria-labelledby="tab-simulator" tabindex="0" class="tabpanel" hidden>
         <h3>Visual &amp; sensory simulator</h3>
-        <p class="panel-lead">See your text with Protanopia, Deuteranopia, Tritanopia, low-brightness glare, Dyslexia and ADHD sensory overload.</p>
-        <div id="simulator-output" class="placeholder">Coming in Phases 4 and 5.</div>
+        <p class="panel-lead">See your text the way readers with colour-vision deficiency see it, next to an accessible baseline.</p>
+        <div id="simulator-output" class="placeholder">Loading simulator…</div>
       </div>
 
       <div role="tabpanel" id="panel-restructurer" aria-labelledby="tab-restructurer" tabindex="0" class="tabpanel" hidden>
