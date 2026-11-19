@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LectureLens Phase 3 Pipeline</title>
+<style>
+  :root { --navy: #041E42; --muted: #3E4C63; --green: #065F46; --red: #B91C1C; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #FFFFFF; color: var(--navy); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .card { max-width: 1020px; margin: 0 auto; padding: 32px 16px 24px; }
+  h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 20px; font-size: 0.975rem; }
+  svg { width: 100%; height: auto; display: block; }
+  .step { font-size: 12px; font-weight: 700; fill: var(--green); letter-spacing: 0.06em; }
+  .title { font-size: 16px; font-weight: 700; fill: var(--navy); }
+  .mono { font-size: 12.5px; fill: var(--muted); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .body { font-size: 13px; fill: var(--muted); }
+  .traps { font-size: 12px; font-weight: 700; fill: var(--red); letter-spacing: 0.06em; }
+  .trap { font-size: 13px; font-weight: 600; fill: var(--red); }
+  .fix { font-size: 13px; fill: var(--green); }
+  .limit { font-size: 13px; font-weight: 600; fill: var(--navy); }
+  .result { font-size: 14px; font-weight: 700; fill: var(--green); }
+  .result-sub { font-size: 13px; fill: var(--navy); }
+  .foot { color: var(--muted); font-size: 0.85rem; margin-top: 14px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>Real-time analysis pipeline and the regex traps it had to survive</h1>
+  <p class="sub">Every keystroke flows left to right inside the browser. Red ✕ = trap found while building. Green ✓ = how <code>js/analyzer.js</code> handles it.</p>
+
+  <svg viewBox="0 0 1000 600" role="img" aria-labelledby="t d">
+    <title id="t">LectureLens Phase 3 text analysis pipeline</title>
+    <desc id="d">Four stages: Raw User Text, Tokenizer and Abbreviation Guard, Syllable and Jargon Scorer, then Debounced SVG Metric Bars with an ARIA live update. Under each stage a card lists the regex traps found and the fix. Result: messy lecture notes went from 13 to 5 sentences, grade 2.9 to 6.8, cognitive load 15 to 35. 28 tests pass and the Phase 1 numbers are unchanged.</desc>
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#041E42"/>
+      </marker>
+    </defs>
+
+    <!-- Stage boxes -->
+    <g>
+      <rect x="10" y="20" width="220" height="128" rx="12" fill="#FFFFFF" stroke="#041E42" stroke-width="2"/>
+      <text x="28" y="46" class="step">STEP 1</text>
+      <text x="28" y="72" class="title">Raw User Text</text>
+      <text x="28" y="96" class="body">textarea input event</text>
+      <text x="28" y="116" class="body">or a sample button</text>
+      <text x="28" y="136" class="mono">stripNoise()</text>
+    </g>
+    <g>
+      <rect x="263" y="20" width="220" height="128" rx="12" fill="#FFFFFF" stroke="#041E42" stroke-width="2"/>
+      <text x="281" y="46" class="step">STEP 2</text>
+      <text x="281" y="72" class="title">Tokenizer &amp;</text>
+      <text x="281" y="92" class="title">Abbreviation Guard</text>
+      <text x="281" y="116" class="mono">splitSentences()</text>
+      <text x="281" y="136" class="mono">tokenizeWords()</text>
+    </g>
+    <g>
+      <rect x="516" y="20" width="220" height="128" rx="12" fill="#FFFFFF" stroke="#041E42" stroke-width="2"/>
+      <text x="534" y="46" class="step">STEP 3</text>
+      <text x="534" y="72" class="title">Syllable &amp;</text>
+      <text x="534" y="92" class="title">Jargon Scorer</text>
+      <text x="534" y="116" class="mono">countSyllables()</text>
+      <text x="534" y="136" class="mono">analyze()</text>
+    </g>
+    <g>
+      <rect x="769" y="20" width="220" height="128" rx="12" fill="#ECF6F1" stroke="#065F46" stroke-width="2"/>
+      <text x="787" y="46" class="step">STEP 4</text>
+      <text x="787" y="72" class="title">Debounced SVG Bars</text>
+      <text x="787" y="92" class="title">+ ARIA Live Update</text>
+      <text x="787" y="116" class="body">render after 150 ms</text>
+      <text x="787" y="136" class="body">announce after 1 s</text>
+    </g>
+
+    <!-- Flow arrows -->
+    <g stroke="#041E42" stroke-width="2.5" fill="none">
+      <path d="M230,84 H259" marker-end="url(#arrow)"/>
+      <path d="M483,84 H512" marker-end="url(#arrow)"/>
+      <path d="M736,84 H765" marker-end="url(#arrow)"/>
+    </g>
+
+    <!-- Connectors to trap cards -->
+    <g stroke="#B91C1C" stroke-width="1.5" stroke-dasharray="4 4">
+      <line x1="120" y1="148" x2="120" y2="176"/>
+      <line x1="373" y1="148" x2="373" y2="176"/>
+      <line x1="626" y1="148" x2="626" y2="176"/>
+      <line x1="879" y1="148" x2="879" y2="176"/>
+    </g>
+
+    <!-- Trap cards -->
+    <g fill="#FDF0F0" stroke="#B91C1C" stroke-width="1.5" stroke-dasharray="7 5">
+      <rect x="10" y="176" width="220" height="260" rx="12"/>
+      <rect x="263" y="176" width="220" height="260" rx="12"/>
+      <rect x="516" y="176" width="220" height="260" rx="12"/>
+      <rect x="769" y="176" width="220" height="260" rx="12"/>
+    </g>
+
+    <g transform="translate(28 204)">
+      <text class="traps">REGEX TRAPS</text>
+      <text y="30" class="trap">✕ **bold** counted as words</text>
+      <text y="50" class="fix">✓ strip markdown first</text>
+      <text y="82" class="trap">✕ code blocks scored</text>
+      <text y="102" class="fix">✓ remove ``` and `code`</text>
+      <text y="134" class="trap">✕ one URL = 6 fake words</text>
+      <text y="154" class="fix">✓ collapse to “link”</text>
+      <text y="186" class="trap">✕ “e.g.” became “e g”</text>
+      <text y="206" class="fix">✓ join to one word “eg”</text>
+    </g>
+    <g transform="translate(281 204)">
+      <text class="traps">REGEX TRAPS</text>
+      <text y="30" class="trap">✕ split on “e.g.”, “Dr.”, “Fig. 2”</text>
+      <text y="50" class="fix">✓ abbreviation guard list</text>
+      <text y="82" class="trap">✕ “2.5 ms.” vs “Ms. Rao”</text>
+      <text y="102" class="fix">✓ unit after a number</text>
+      <text y="134" class="trap">✕ “etc. Next week…”</text>
+      <text y="154" class="fix">✓ ends only before a capital</text>
+      <text y="186" class="trap">✕ 207 ms on 10k words</text>
+      <text y="206" class="fix">✓ local scan: 5.9 ms</text>
+    </g>
+    <g transform="translate(534 204)">
+      <text class="traps">REGEX TRAPS</text>
+      <text y="30" class="trap">✕ “CPU” = 1 syllable</text>
+      <text y="50" class="fix">✓ spell acronyms: 3</text>
+      <text y="82" class="trap">✕ jargon list knew only OS</text>
+      <text y="102" class="fix">✓ wider CS word list</text>
+      <text y="134" class="limit">◆ known limits:</text>
+      <text y="154" class="limit">“processes” = 2, “wanted” = 1</text>
+      <text y="176" class="body">listed in KNOWN_LIMITS and</text>
+      <text y="194" class="body">left alone to keep Phase 1</text>
+      <text y="212" class="body">numbers stable</text>
+    </g>
+    <g transform="translate(787 204)">
+      <text class="traps">UX TRAPS</text>
+      <text y="30" class="trap">✕ re-score on every key</text>
+      <text y="50" class="fix">✓ 150 ms debounce</text>
+      <text y="82" class="trap">✕ screen reader flooded</text>
+      <text y="102" class="fix">✓ 1 s, only when changed</text>
+      <text y="134" class="trap">✕ grade of −0.5</text>
+      <text y="154" class="fix">✓ floor shown grade at 0</text>
+      <text y="186" class="trap">✕ 6px chart text on phones</text>
+      <text y="206" class="fix">✓ compact stacked layout</text>
+    </g>
+
+    <!-- Result strip -->
+    <rect x="10" y="462" width="979" height="114" rx="12" fill="#ECF6F1" stroke="#065F46" stroke-width="2"/>
+    <text x="34" y="490" class="step">RESULT ON SAMPLE C (MESSY LECTURE NOTES)</text>
+    <text x="34" y="522" class="result">Sentences 13 → 5</text>
+    <text x="250" y="522" class="result">Grade 2.9 → 6.8</text>
+    <text x="450" y="522" class="result">Cognitive load 15 → 35</text>
+    <text x="34" y="552" class="result-sub">28 regression tests pass  ·  Phase 1 numbers unchanged (24.0 vs 2.6, 96 vs 14)  ·  zero dependencies</text>
+  </svg>
+
+  <p class="foot">Source: <code>js/analyzer.js</code>, <code>scripts/test-analyzer.js</code>, <code>data/benchmarks.js</code> (Sample C). Before numbers are from the Phase 2 engine on the same text.</p>
+</main>
+</body>
+</html>
