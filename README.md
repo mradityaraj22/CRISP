@@ -136,7 +136,7 @@ LectureLens v1.0 is honest about what it cannot do:
 3. Per-subject jargon lists (biology, law, maths) and user-defined abbreviations.
 4. An offline syllable dictionary for common words.
 5. Cross-browser and real screen-reader testing, plus a Lighthouse accessibility score.
-6. A user study with real lecturers and students instead of samples.
+6. A proper user study with a real class, beyond the two-peer test in Phase 7.
 
 ---
 

@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LectureLens 9-Phase Journey</title>
+<style>
+  :root { --navy: #041E42; --muted: #3E4C63; --green: #065F46; --red: #B91C1C; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #FFFFFF; color: var(--navy); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .card { max-width: 1020px; margin: 0 auto; padding: 32px 16px 24px; }
+  h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 20px; font-size: 0.975rem; }
+  svg { width: 100%; height: auto; display: block; }
+  .ph { font-size: 12px; font-weight: 800; letter-spacing: 0.06em; fill: #FFFFFF; }
+  .title { font-size: 15.5px; font-weight: 800; fill: var(--navy); }
+  .out { font-size: 14px; font-weight: 800; fill: var(--green); }
+  .t { font-size: 12.5px; fill: var(--muted); }
+  .big { font-size: 30px; font-weight: 800; fill: var(--green); }
+  .bigl { font-size: 13px; font-weight: 700; fill: var(--navy); }
+  .bigs { font-size: 12px; fill: var(--muted); }
+  .sec { font-size: 12.5px; font-weight: 800; letter-spacing: 0.06em; }
+  .open { font-size: 13px; fill: var(--navy); }
+  .foot { color: var(--muted); font-size: 0.85rem; margin-top: 14px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>LectureLens: nine phases from a benchmark to v1.0</h1>
+  <p class="sub">Each phase shipped working code, small commits and a devlog. Every number below is measured, not estimated.</p>
+
+  <svg viewBox="0 0 1000 900" role="img" aria-labelledby="t d">
+    <title id="t">LectureLens nine-phase build roadmap and outcomes</title>
+    <desc id="d">Nine phase cards in three rows. 1 Empirical benchmark: cognitive load 96 versus 14. 2 Bounded proposal and tokens: five things cut, body text contrast 15.6 to 1. 3 Live analyzer: messy notes 13 to 5 sentences, 10,000 words 207 to 5.9 milliseconds. 4 SVG visual simulator: found red-green badges at colour difference 3.4, chart fixed. 5 Deterministic restructurer: 128 of 128 words kept. 6 WCAG and keyboard audit: 106 of 106 checks, 2 bugs found by hand. 7 Peer UX testing: 3 blind spots, 3 fixes. 8 Offline PWA hardening: loaded with the server off, 162 milliseconds to under 50. 9 Stakeholder docs and v1.0: README, licence, changelog. Outcomes: cognitive load 96 to 14, 32 commits of which 19 are code, 0 runtime dependencies, works offline. Still open: ADHD simulation, a contrast checker for users' own colours, Firefox, Safari and screen-reader testing, and a Lighthouse score.</desc>
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#041E42"/>
+      </marker>
+    </defs>
+
+    <!-- Row arrows -->
+    <g stroke="#041E42" stroke-width="2.2" fill="none">
+      <path d="M318,92 H340" marker-end="url(#arrow)"/><path d="M648,92 H670" marker-end="url(#arrow)"/>
+      <path d="M318,262 H340" marker-end="url(#arrow)"/><path d="M648,262 H670" marker-end="url(#arrow)"/>
+      <path d="M318,432 H340" marker-end="url(#arrow)"/><path d="M648,432 H670" marker-end="url(#arrow)"/>
+      <path d="M830,158 V172 H160 V186" marker-end="url(#arrow)"/>
+      <path d="M830,328 V342 H160 V356" marker-end="url(#arrow)"/>
+    </g>
+
+    <!-- Card template: x, y. Badge, title, outcome, detail -->
+    <g>
+      <rect x="10" y="26" width="308" height="132" rx="12" fill="#FFFFFF" stroke="#041E42" stroke-width="1.5"/>
+      <rect x="10" y="26" width="92" height="26" rx="12" fill="#041E42"/><text x="24" y="44" class="ph">PHASE 1</text>
+      <text x="26" y="80" class="title">Empirical Benchmark</text>
+      <text x="26" y="110" class="out">Cognitive load 96 → 14</text>
+      <text x="26" y="134" class="t">Dense vs plain text, same concept</text>
+    </g>
+    <g>
+      <rect x="340" y="26" width="308" height="132" rx="12" fill="#FFFFFF" stroke="#041E42" stroke-width="1.5"/>
+      <rect x="340" y="26" width="92" height="26" rx="12" fill="#041E42"/><text x="354" y="44" class="ph">PHASE 2</text>
+      <text x="356" y="80" class="title">Bounded Proposal &amp; Tokens</text>
+      <text x="356" y="110" class="out">5 things cut on purpose</text>
+      <text x="356" y="134" class="t">No LLM, OCR, accounts, frameworks…</text>
+    </g>
+    <g>
+      <rect x="670" y="26" width="320" height="132" rx="12" fill="#FFFFFF" stroke="#041E42" stroke-width="1.5"/>
+      <rect x="670" y="26" width="92" height="26" rx="12" fill="#041E42"/><text x="684" y="44" class="ph">PHASE 3</text>
+      <text x="686" y="80" class="title">Live Analyzer</text>
+      <text x="686" y="110" class="out">13 → 5 sentences on messy notes</text>
+      <text x="686" y="134" class="t">10,000 words: 207 ms → 5.9 ms</text>
+    </g>
+
+    <g>
+      <rect x="10" y="196" width="308" height="132" rx="12" fill="#FFFFFF" stroke="#041E42" stroke-width="1.5"/>
+      <rect x="10" y="196" width="92" height="26" rx="12" fill="#041E42"/><text x="24" y="214" class="ph">PHASE 4</text>
+      <text x="26" y="250" class="title">SVG Visual Simulator</text>
+      <text x="26" y="280" class="out">Own badges: ΔE 22.6 → 3.4</text>
+      <text x="26" y="304" class="t">Self-test found the chart bug; fixed</text>
+    </g>
+    <g>
+      <rect x="340" y="196" width="308" height="132" rx="12" fill="#FFFFFF" stroke="#041E42" stroke-width="1.5"/>
+      <rect x="340" y="196" width="92" height="26" rx="12" fill="#041E42"/><text x="354" y="214" class="ph">PHASE 5</text>
+      <text x="356" y="250" class="title">Deterministic Restructurer</text>
+      <text x="356" y="280" class="out">128 / 128 words kept, in order</text>
+      <text x="356" y="304" class="t">48-word sentence → 16 + 16 + 16</text>
+    </g>
+    <g>
+      <rect x="670" y="196" width="320" height="132" rx="12" fill="#FFFFFF" stroke="#041E42" stroke-width="1.5"/>
+      <rect x="670" y="196" width="92" height="26" rx="12" fill="#041E42"/><text x="684" y="214" class="ph">PHASE 6</text>
+      <text x="686" y="250" class="title">WCAG &amp; Keyboard Audit</text>
+      <text x="686" y="280" class="out">106 / 106 automated checks</text>
+      <text x="686" y="304" class="t">Yet 2 real bugs found only by hand</text>
+    </g>
+
+    <g>
+      <rect x="10" y="366" width="308" height="132" rx="12" fill="#FFFFFF" stroke="#041E42" stroke-width="1.5"/>
+      <rect x="10" y="366" width="92" height="26" rx="12" fill="#041E42"/><text x="24" y="384" class="ph">PHASE 7</text>
+      <text x="26" y="420" class="title">Peer UX Testing</text>
+      <text x="26" y="450" class="out">3 blind spots → 3 fixes</text>
+      <text x="26" y="474" class="t">Verdicts, presets, before/after</text>
+    </g>
+    <g>
+      <rect x="340" y="366" width="308" height="132" rx="12" fill="#FFFFFF" stroke="#041E42" stroke-width="1.5"/>
+      <rect x="340" y="366" width="92" height="26" rx="12" fill="#041E42"/><text x="354" y="384" class="ph">PHASE 8</text>
+      <text x="356" y="420" class="title">Offline PWA Hardening</text>
+      <text x="356" y="450" class="out">Loaded with the server off</text>
+      <text x="356" y="474" class="t">100k-word paste: 162 ms → &lt;50 ms</text>
+    </g>
+    <g>
+      <rect x="670" y="366" width="320" height="132" rx="12" fill="#ECF6F1" stroke="#065F46" stroke-width="2"/>
+      <rect x="670" y="366" width="92" height="26" rx="12" fill="#065F46"/><text x="684" y="384" class="ph">PHASE 9</text>
+      <text x="686" y="420" class="title">Stakeholder Docs &amp; v1.0</text>
+      <text x="686" y="450" class="out">v1.0.0 · MIT licence</text>
+      <text x="686" y="474" class="t">README a lecturer can use in 30 s</text>
+    </g>
+
+    <!-- Outcomes -->
+    <rect x="10" y="526" width="980" height="170" rx="14" fill="#ECF6F1" stroke="#065F46" stroke-width="2"/>
+    <text x="34" y="558" class="sec" style="fill:#065F46">v1.0 OUTCOMES</text>
+    <g>
+      <text x="34" y="614" class="big">96 → 14</text>
+      <text x="34" y="642" class="bigl">Cognitive load</text>
+      <text x="34" y="662" class="bigs">Sample A vs Sample B</text>
+
+      <text x="280" y="614" class="big">32</text>
+      <text x="280" y="642" class="bigl">Atomic commits</text>
+      <text x="280" y="662" class="bigs">19 code · 13 docs</text>
+
+      <text x="500" y="614" class="big">0</text>
+      <text x="500" y="642" class="bigl">Runtime dependencies</text>
+      <text x="500" y="662" class="bigs">plain HTML, CSS, JS</text>
+
+      <text x="740" y="614" class="big">Offline</text>
+      <text x="740" y="642" class="bigl">Works with no network</text>
+      <text x="740" y="662" class="bigs">tested with server off</text>
+    </g>
+
+    <!-- Still open -->
+    <rect x="10" y="716" width="980" height="170" rx="14" fill="#FDF0F0" stroke="#B91C1C" stroke-width="1.5" stroke-dasharray="7 5"/>
+    <text x="34" y="748" class="sec" style="fill:#B91C1C">HONEST LIMITS OF v1.0</text>
+    <text x="34" y="782" class="open">✕ ADHD sensory-overload simulation: promised in PROPOSAL.md, not built</text>
+    <text x="34" y="808" class="open">✕ Syllables and grade are heuristic estimates (about ±1 grade); English only</text>
+    <text x="34" y="834" class="open">✕ Restructurer splits and labels; it cannot explain or rewrite a concept</text>
+    <text x="34" y="860" class="open">✕ Not yet tested: Firefox, Safari, a real screen reader, a Lighthouse score, real students</text>
+  </svg>
+
+  <p class="foot">Source: <code>git log</code>, <code>scripts/benchmark.js</code>, <code>scripts/audit.js</code>, <code>npm test</code>, <code>PROPOSAL.md</code> section 10, devlogs 1–9.</p>
+</main>
+</body>
+</html>
