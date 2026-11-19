@@ -1,6 +1,6 @@
 {
   "name": "lecturelens",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Cognitive load and visual accessibility simulator for dense technical and lecture content.",
   "type": "module",
   "private": true,
