@@ -1,6 +1,6 @@
-// UI entry point. Wires the DOM to the pure modules. No logic that needs testing lives here.
+// UI entry point. Wires the DOM to the modules. No logic that needs testing lives here.
 import { SAMPLES } from '../data/benchmarks.js';
-import { tokenizeWords } from './analyzer.js';
+import { tokenizeWords, mountAnalyzer } from './analyzer.js';
 
 const textarea = document.getElementById('source-text');
 const live = document.getElementById('live-region');
@@ -11,19 +11,29 @@ function updateWordCount() {
   const n = tokenizeWords(textarea.value).length;
   wordCount.textContent = `· ${n} ${n === 1 ? 'word' : 'words'}`;
 }
-
-function loadSample(sample, { announce = true } = {}) {
-  textarea.value = sample.text;
-  updateWordCount();
-  if (announce) live.textContent = `Loaded ${sample.label}.`;
-}
-
 textarea.addEventListener('input', updateWordCount);
-document.getElementById('load-sample-a').addEventListener('click', () => loadSample(SAMPLES.dense));
-document.getElementById('load-sample-b').addEventListener('click', () => loadSample(SAMPLES.plain));
 
 // Start with the dense sample so first-time visitors see the problem immediately.
-loadSample(SAMPLES.dense, { announce: false });
+textarea.value = SAMPLES.dense.text;
+updateWordCount();
+
+// ---- Readability Analyzer (live, debounced) ----
+const analyzer = mountAnalyzer({
+  input: textarea,
+  output: document.getElementById('analyzer-output'),
+  live,
+});
+
+function loadSample(sample) {
+  textarea.value = sample.text;
+  updateWordCount();
+  analyzer.update();
+  live.textContent = `Loaded ${sample.label}.`;
+}
+
+document.getElementById('load-sample-a').addEventListener('click', () => loadSample(SAMPLES.dense));
+document.getElementById('load-sample-b').addEventListener('click', () => loadSample(SAMPLES.plain));
+document.getElementById('load-sample-c').addEventListener('click', () => loadSample(SAMPLES.messy));
 
 // ---- Tabs (WAI-ARIA Authoring Practices: automatic activation) ----
 const tabs = [...document.querySelectorAll('[role="tab"]')];

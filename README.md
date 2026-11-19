@@ -15,6 +15,7 @@ Zero dependencies. No backend. Everything runs in your browser.
 ```bash
 npm run serve        # then open http://localhost:8080
 npm run benchmark    # prints the Phase 1 readability comparison
+npm test             # runs the analyzer regression tests (no dependencies)
 ```
 
 ES modules do not load from `file://`, so use a local server.

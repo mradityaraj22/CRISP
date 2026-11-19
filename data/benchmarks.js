@@ -38,4 +38,18 @@ export const SAMPLES = Object.freeze({
         'We call this deadlock.',
     ].join('\n'),
   },
+
+  // Phase 3: real-world lecture notes full of regex traps (abbreviations, decimals, a URL,
+  // an ellipsis, acronyms). It has exactly 5 sentences.
+  messy: {
+    id: 'C',
+    label: 'Sample C: Messy lecture notes',
+    expectedSentences: 5,
+    text:
+      "Dr. Rao's lecture covers CPU scheduling, e.g. round-robin and SJF, as shown in Fig. 2 on p. 14. " +
+      'A time quantum of 2.5 ms is typical, i.e. short enough for interactive use. ' +
+      'See https://example.edu/os/notes.html for details... ' +
+      'The CPU switches context approx. every 10 ms vs. 100 ms in older systems. ' +
+      'Prof. Iyer et al. measured a 3.2x speedup.',
+  },
 });
