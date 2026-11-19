@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LectureLens Phase 6 Audit Matrix</title>
+<style>
+  :root { --navy: #041E42; --muted: #3E4C63; --green: #065F46; --red: #B91C1C; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #FFFFFF; color: var(--navy); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .card { max-width: 1020px; margin: 0 auto; padding: 32px 16px 24px; }
+  h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 20px; font-size: 0.975rem; }
+  svg { width: 100%; height: auto; display: block; }
+  .colh { font-size: 17px; font-weight: 800; }
+  .colsub { font-size: 13px; fill: var(--muted); }
+  .rowh { font-size: 15px; font-weight: 800; fill: var(--navy); }
+  .rowsub { font-size: 12.5px; fill: var(--muted); }
+  .bad { font-size: 13.5px; fill: var(--navy); }
+  .badx { font-size: 15px; font-weight: 800; fill: var(--red); }
+  .good { font-size: 13.5px; fill: var(--navy); }
+  .goodx { font-size: 15px; font-weight: 800; fill: var(--green); }
+  .num { font-weight: 800; fill: var(--green); }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px; }
+  .sec { font-size: 12.5px; font-weight: 700; letter-spacing: 0.06em; }
+  .big { font-size: 26px; font-weight: 800; }
+  .foot { color: var(--muted); font-size: 0.85rem; margin-top: 14px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>Accessibility as a setting vs accessibility as the default</h1>
+  <p class="sub">Left: the common pattern. Right: what LectureLens ships to every user, verified by <code>scripts/audit.js</code> and by hand.</p>
+
+  <svg viewBox="0 0 1000 800" role="img" aria-labelledby="t d">
+    <title id="t">Configurable Accommodation versus Universal Default Design</title>
+    <desc id="d">Five rows compare the two approaches. Contrast: low default with a hidden high-contrast mode, versus AAA by default with body text at 15.6 to 1 and muted text at 8.2 to 1. Status: red and green dots only, versus colour plus icon plus word. Keyboard: mouse-only tabs, versus arrow-key tabs and a working skip link. Screen reader: silent or wrong updates, versus one polite announcer for the visible tab. Effort: the disabled user configures settings, versus nobody needs to. Below: the automated audit passed 103 of 103 checks, but missed the screen-reader bug, which was found by testing by hand.</desc>
+
+    <!-- Column headers -->
+    <rect x="250" y="10" width="360" height="74" rx="12" fill="#FDF0F0" stroke="#B91C1C" stroke-width="1.5" stroke-dasharray="7 5"/>
+    <text x="272" y="42" class="colh" style="fill:#B91C1C">✕ Configurable Accommodation</text>
+    <text x="272" y="66" class="colsub">Accessibility hidden in a settings menu</text>
+    <rect x="626" y="10" width="364" height="74" rx="12" fill="#ECF6F1" stroke="#065F46" stroke-width="2"/>
+    <text x="648" y="42" class="colh" style="fill:#065F46">✓ Universal Default Design</text>
+    <text x="648" y="66" class="colsub">Accessible for everyone, with nothing to switch on</text>
+
+    <!-- Row backgrounds -->
+    <g fill="#F7F8FA">
+      <rect x="10" y="96" width="980" height="96" rx="10"/>
+      <rect x="10" y="300" width="980" height="96" rx="10"/>
+      <rect x="10" y="504" width="980" height="86" rx="10"/>
+    </g>
+
+    <!-- Row 1: contrast -->
+    <text x="28" y="132" class="rowh">Contrast</text>
+    <text x="28" y="154" class="rowsub">WCAG 2.1 ratios</text>
+    <text x="272" y="132" class="badx">✕</text><text x="294" y="132" class="bad">Grey-on-white default text</text>
+    <text x="294" y="154" class="bad">"High contrast mode" in settings</text>
+    <text x="648" y="132" class="goodx">✓</text><text x="670" y="132" class="good">Body text <tspan class="num">15.6:1</tspan> · muted <tspan class="num">8.2:1</tspan> (AAA)</text>
+    <text x="670" y="154" class="good">Clarity green <tspan class="num">7.7:1</tspan> · warning red <tspan class="num">6.5:1</tspan> (AA)</text>
+    <text x="670" y="176" class="good">OS "more contrast" applied automatically</text>
+
+    <!-- Row 2: status meaning -->
+    <text x="28" y="234" class="rowh">Status</text>
+    <text x="28" y="256" class="rowsub">pass / fail, friction</text>
+    <text x="272" y="234" class="badx">✕</text><text x="294" y="234" class="bad">Colour only:</text>
+    <circle cx="390" cy="229" r="8" fill="#D32F2F"/><circle cx="414" cy="229" r="8" fill="#2E7D32"/>
+    <text x="294" y="258" class="bad">Identical in greyscale (ΔE 0.7)</text>
+    <text x="648" y="234" class="goodx">✓</text><text x="670" y="234" class="good">Colour + icon + word:</text>
+    <rect x="670" y="246" width="128" height="26" rx="13" fill="#FDF0F0" stroke="#B91C1C" stroke-width="1.5"/>
+    <text x="682" y="264" style="font-size:13px;font-weight:700;fill:#B91C1C">▲ High friction</text>
+    <rect x="806" y="246" width="124" height="26" rx="13" fill="#ECF6F1" stroke="#065F46" stroke-width="1.5"/>
+    <text x="818" y="264" style="font-size:13px;font-weight:700;fill:#065F46">● Low friction</text>
+
+    <!-- Row 3: keyboard -->
+    <text x="28" y="336" class="rowh">Keyboard</text>
+    <text x="28" y="358" class="rowsub">no mouse</text>
+    <text x="272" y="336" class="badx">✕</text><text x="294" y="336" class="bad">Custom tabs only react to clicks</text>
+    <text x="294" y="358" class="bad">Skip link leaves focus on &lt;body&gt;</text>
+    <text x="648" y="336" class="goodx">✓</text><text x="670" y="336" class="good">← → Home End move between tabs</text>
+    <text x="670" y="358" class="good">Roving <tspan class="mono">tabindex</tspan>, visible focus ring</text>
+    <text x="670" y="380" class="good">Skip link focuses <tspan class="mono">&lt;main tabindex="-1"&gt;</tspan></text>
+
+    <!-- Row 4: screen reader -->
+    <text x="28" y="438" class="rowh">Screen reader</text>
+    <text x="28" y="460" class="rowsub">live updates</text>
+    <text x="272" y="438" class="badx">✕</text><text x="294" y="438" class="bad">Results update silently, or a</text>
+    <text x="294" y="460" class="bad">hidden panel talks instead</text>
+    <text x="648" y="438" class="goodx">✓</text><text x="670" y="438" class="good">One <tspan class="mono">aria-live="polite"</tspan> announcer</text>
+    <text x="670" y="460" class="good">speaks for the visible tab, 1 s after</text>
+    <text x="670" y="482" class="good">typing stops: "10 points in 4 cards…"</text>
+
+    <!-- Row 5: who does the work -->
+    <text x="28" y="540" class="rowh">Who does</text>
+    <text x="28" y="560" class="rowh">the work?</text>
+    <text x="272" y="540" class="badx">✕</text><text x="294" y="540" class="bad">The disabled user must find,</text>
+    <text x="294" y="562" class="bad">understand and switch on settings</text>
+    <text x="648" y="540" class="goodx">✓</text><text x="670" y="540" class="good">Nobody. It is the default</text>
+    <text x="670" y="562" class="good">for every user, on every visit.</text>
+
+    <!-- Audit vs reality -->
+    <rect x="10" y="616" width="486" height="170" rx="14" fill="#ECF6F1" stroke="#065F46" stroke-width="2"/>
+    <text x="34" y="648" class="sec" style="fill:#065F46">AUTOMATED · scripts/audit.js</text>
+    <text x="34" y="688" class="big" style="fill:#065F46">103 / 103 pass</text>
+    <text x="34" y="716" class="good">72 contrast pairs in 4 themes, 24 structure</text>
+    <text x="34" y="736" class="good">checks, 7 source checks.</text>
+    <text x="34" y="764" class="good">First run: 66 / 67. It caught the skip link.</text>
+
+    <rect x="504" y="616" width="486" height="170" rx="14" fill="#FDF0F0" stroke="#B91C1C" stroke-width="1.5" stroke-dasharray="7 5"/>
+    <text x="528" y="648" class="sec" style="fill:#B91C1C">FOUND ONLY BY HAND · KEYBOARD + LIVE LOG</text>
+    <text x="528" y="688" class="big" style="fill:#B91C1C">Contrast: 0 fails</text>
+    <text x="528" y="716" class="good">Yet on the Restructurer tab, a screen reader</text>
+    <text x="528" y="736" class="good">heard the hidden Analyzer's grade, and the</text>
+    <text x="528" y="756" class="good">visible update stayed silent.</text>
+  </svg>
+
+  <p class="foot">Source: <code>scripts/audit.js</code>, <code>styles/tokens.css</code>, <code>index.html</code>, <code>js/app.js</code>. Ratios are real audit output for the light theme.</p>
+</main>
+</body>
+</html>
