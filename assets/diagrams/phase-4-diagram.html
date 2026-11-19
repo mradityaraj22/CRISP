@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LectureLens Phase 4 Filters</title>
+<style>
+  :root { --navy: #041E42; --muted: #3E4C63; --green: #065F46; --red: #B91C1C; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #FFFFFF; color: var(--navy); font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .card { max-width: 1020px; margin: 0 auto; padding: 32px 16px 24px; }
+  h1 { font-size: 1.5rem; line-height: 1.25; margin: 0 0 6px; }
+  .sub { color: var(--muted); margin: 0 0 20px; font-size: 0.975rem; }
+  svg { width: 100%; height: auto; display: block; }
+  .sec { font-size: 13px; font-weight: 700; fill: var(--green); letter-spacing: 0.06em; }
+  .h { font-size: 15px; font-weight: 700; fill: var(--navy); }
+  .t { font-size: 13px; fill: var(--muted); }
+  .m { font-size: 13px; fill: var(--navy); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .mm { font-size: 13px; fill: var(--muted); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .cell { font-size: 14px; fill: var(--navy); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; text-anchor: middle; }
+  .cell-dim { fill: #6B7689; }
+  .axis { font-size: 13px; font-weight: 700; fill: var(--muted); text-anchor: middle; }
+  .bad { font-size: 13px; font-weight: 700; fill: var(--red); }
+  .good { font-size: 13px; font-weight: 700; fill: var(--green); }
+  .pill { font-size: 13px; font-weight: 700; fill: var(--navy); text-anchor: middle; }
+  .foot { color: var(--muted); font-size: 0.85rem; margin-top: 14px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<main class="card">
+  <h1>How the simulator changes colour and type</h1>
+  <p class="sub">Top: one pixel through a 5×4 <code>&lt;feColorMatrix&gt;</code>. Bottom: CSS typography stress, and why colour-only badges fail.</p>
+
+  <svg viewBox="0 0 1000 720" role="img" aria-labelledby="t d">
+    <title id="t">LectureLens Phase 4 filter pipeline</title>
+    <desc id="d">A red pixel #B91C1C is converted to linear RGB (0.485, 0.012, 0.012), multiplied by the Deuteranopia 5 by 4 feColorMatrix, and comes out as olive #776A12. Below, accessible typography (line height 1.65, left aligned) is compared with crowded typography (line height 1.15, negative letter spacing, justified). On the right, dark-mode red and green badges drop from a colour difference of 22.6 to 3.4 under Deuteranopia when they rely on colour alone, but stay readable with an icon and a word.</desc>
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="#041E42"/>
+      </marker>
+    </defs>
+
+    <!-- ===== 1. Colour matrix ===== -->
+    <text x="20" y="28" class="sec">1 · COLOUR: ONE PIXEL THROUGH THE DEUTERANOPIA MATRIX</text>
+    <rect x="10" y="40" width="980" height="300" rx="14" fill="#FFFFFF" stroke="#041E42" stroke-width="1.5"/>
+
+    <!-- Input pixel -->
+    <text x="34" y="74" class="h">Input pixel</text>
+    <rect x="34" y="88" width="120" height="70" rx="8" fill="#B91C1C"/>
+    <text x="34" y="182" class="m">#B91C1C</text>
+    <text x="34" y="202" class="t">sRGB 185, 28, 28</text>
+    <text x="34" y="230" class="t">to linear RGB first</text>
+    <text x="34" y="250" class="mm">R 0.485</text>
+    <text x="34" y="268" class="mm">G 0.012</text>
+    <text x="34" y="286" class="mm">B 0.012</text>
+    <text x="34" y="304" class="mm">A 1</text>
+
+    <path d="M196,190 H236" stroke="#041E42" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+
+    <!-- Matrix: columns R G B A offset, rows R' G' B' A' -->
+    <text x="258" y="74" class="h">5 × 4 feColorMatrix (values attribute)</text>
+    <g transform="translate(258 88)">
+      <text x="62" y="18" class="axis">R</text>
+      <text x="142" y="18" class="axis">G</text>
+      <text x="222" y="18" class="axis">B</text>
+      <text x="302" y="18" class="axis">A</text>
+      <text x="382" y="18" class="axis">+1</text>
+      <rect x="22" y="28" width="400" height="152" rx="6" fill="#F7F8FA" stroke="#6B7689"/>
+      <rect x="342" y="28" width="80" height="152" fill="#EEF1F5"/>
+      <rect x="22" y="142" width="400" height="38" fill="#EEF1F5"/>
+      <text x="8" y="52" class="axis">R′</text>
+      <text x="8" y="90" class="axis">G′</text>
+      <text x="8" y="128" class="axis">B′</text>
+      <text x="8" y="166" class="axis">A′</text>
+      <text x="62" y="52" class="cell">0.367</text><text x="142" y="52" class="cell">0.861</text><text x="222" y="52" class="cell">−0.228</text><text x="302" y="52" class="cell cell-dim">0</text><text x="382" y="52" class="cell cell-dim">0</text>
+      <text x="62" y="90" class="cell">0.280</text><text x="142" y="90" class="cell">0.673</text><text x="222" y="90" class="cell">0.047</text><text x="302" y="90" class="cell cell-dim">0</text><text x="382" y="90" class="cell cell-dim">0</text>
+      <text x="62" y="128" class="cell">−0.012</text><text x="142" y="128" class="cell">0.043</text><text x="222" y="128" class="cell">0.969</text><text x="302" y="128" class="cell cell-dim">0</text><text x="382" y="128" class="cell cell-dim">0</text>
+      <text x="62" y="166" class="cell cell-dim">0</text><text x="142" y="166" class="cell cell-dim">0</text><text x="222" y="166" class="cell cell-dim">0</text><text x="302" y="166" class="cell">1</text><text x="382" y="166" class="cell cell-dim">0</text>
+    </g>
+    <text x="280" y="296" class="m">R′ = 0.367×0.485 + 0.861×0.012 − 0.228×0.012 = 0.186</text>
+    <text x="280" y="320" class="t">Shaded: alpha row and offset stay at identity.</text>
+
+    <path d="M700,190 H740" stroke="#041E42" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+
+    <!-- Output pixel -->
+    <text x="762" y="74" class="h">Output pixel</text>
+    <rect x="762" y="88" width="120" height="70" rx="8" fill="#776A12"/>
+    <text x="762" y="182" class="m">#776A12</text>
+    <text x="762" y="202" class="t">linear 0.186, 0.144, 0.006</text>
+    <text x="762" y="236" class="bad">Red becomes olive.</text>
+    <text x="762" y="256" class="t">Green #065F46 becomes</text>
+    <text x="762" y="274" class="t">grey-olive #525048.</text>
+    <text x="762" y="304" class="mm">color-interpolation-</text>
+    <text x="762" y="322" class="mm">filters="linearRGB"</text>
+
+    <!-- ===== 2. Typography ===== -->
+    <text x="20" y="384" class="sec">2 · TYPOGRAPHY: CSS STRESS MODIFIERS</text>
+    <rect x="10" y="396" width="470" height="314" rx="14" fill="#FFFFFF" stroke="#041E42" stroke-width="1.5"/>
+
+    <text x="34" y="428" class="good">✓ Accessible baseline</text>
+    <g fill="#041E42">
+      <rect x="34" y="444" width="180" height="7" rx="3"/>
+      <rect x="34" y="467" width="160" height="7" rx="3"/>
+      <rect x="34" y="490" width="186" height="7" rx="3"/>
+      <rect x="34" y="513" width="120" height="7" rx="3"/>
+      <rect x="34" y="536" width="172" height="7" rx="3"/>
+    </g>
+    <text x="34" y="576" class="mm">line-height: 1.65</text>
+    <text x="34" y="596" class="mm">text-align: left</text>
+    <text x="34" y="616" class="mm">max-width: 68ch</text>
+
+    <text x="256" y="428" class="bad">✕ Crowding (Dyslexia stress)</text>
+    <g fill="#041E42">
+      <rect x="256" y="444" width="74" height="7"/><rect x="336" y="444" width="44" height="7"/><rect x="390" y="444" width="66" height="7"/>
+      <rect x="256" y="455" width="40" height="7"/><rect x="306" y="455" width="74" height="7"/><rect x="390" y="455" width="66" height="7"/>
+      <rect x="256" y="466" width="96" height="7"/><rect x="362" y="466" width="18" height="7"/><rect x="390" y="466" width="66" height="7"/>
+      <rect x="256" y="477" width="58" height="7"/><rect x="324" y="477" width="56" height="7"/><rect x="390" y="477" width="66" height="7"/>
+      <rect x="256" y="488" width="84" height="7"/><rect x="350" y="488" width="30" height="7"/><rect x="390" y="488" width="66" height="7"/>
+      <rect x="256" y="499" width="110" height="7"/>
+    </g>
+    <line x1="385" y1="440" x2="385" y2="497" stroke="#B91C1C" stroke-width="1.5" stroke-dasharray="3 3"/>
+    <text x="256" y="530" class="t">Justified text opens a vertical</text>
+    <text x="256" y="548" class="t">“river” (red dashes) of space.</text>
+    <text x="256" y="576" class="mm">line-height: 1.15</text>
+    <text x="256" y="596" class="mm">letter-spacing: −0.02em</text>
+    <text x="256" y="616" class="mm">text-align: justify</text>
+
+    <line x1="34" y1="640" x2="456" y2="640" stroke="#D5DAE1"/>
+    <text x="34" y="666" class="bad">✕ Glare</text>
+    <text x="96" y="666" class="mm">contrast(0.7) brightness(1.12)</text>
+    <text x="34" y="690" class="t">plus a white reflection overlay and 55% ink strength.</text>
+
+    <!-- ===== 3. Badges ===== -->
+    <text x="510" y="384" class="sec">3 · WHY COLOUR-ONLY BADGES COLLAPSE</text>
+    <rect x="500" y="396" width="490" height="314" rx="14" fill="#FFFFFF" stroke="#041E42" stroke-width="1.5"/>
+    <text x="524" y="428" class="t">LectureLens dark-mode badge colours</text>
+    <text x="680" y="460" class="axis">Typical vision</text>
+    <text x="870" y="460" class="axis">Deuteranopia</text>
+
+    <text x="524" y="500" class="h">Colour</text>
+    <text x="524" y="518" class="h">only</text>
+    <rect x="610" y="482" width="64" height="30" rx="15" fill="#FCA5A5"/>
+    <rect x="686" y="482" width="64" height="30" rx="15" fill="#6EE7B7"/>
+    <rect x="800" y="482" width="64" height="30" rx="15" fill="#CBC3A4"/>
+    <rect x="876" y="482" width="64" height="30" rx="15" fill="#D1CCBA"/>
+    <text x="610" y="540" class="t">ΔE 22.6: clearly different</text>
+    <text x="800" y="540" class="bad">ΔE 3.4: practically identical</text>
+
+    <line x1="524" y1="566" x2="966" y2="566" stroke="#D5DAE1"/>
+
+    <text x="524" y="604" class="h">Icon +</text>
+    <text x="524" y="622" class="h">word</text>
+    <rect x="600" y="588" width="84" height="30" rx="15" fill="#FCA5A5"/>
+    <text x="642" y="608" class="pill">▲ High</text>
+    <rect x="690" y="588" width="76" height="30" rx="15" fill="#6EE7B7"/>
+    <text x="728" y="608" class="pill">● Low</text>
+    <rect x="790" y="588" width="84" height="30" rx="15" fill="#CBC3A4"/>
+    <text x="832" y="608" class="pill">▲ High</text>
+    <rect x="880" y="588" width="76" height="30" rx="15" fill="#D1CCBA"/>
+    <text x="918" y="608" class="pill">● Low</text>
+    <text x="524" y="660" class="good">✓ Shape and word survive any filter.</text>
+    <text x="524" y="684" class="t">Same fix applied to the analyzer chart: dots + “Low / Moderate / High”.</text>
+  </svg>
+
+  <p class="foot">Source: <code>js/simulator.js</code> (CVD_MODES, Machado et al. 2009), <code>index.html</code> filter defs, <code>scripts/test-simulator.js</code>. ΔE = OKLab distance × 100; under 8 is hard to tell apart.</p>
+</main>
+</body>
+</html>
